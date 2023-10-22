@@ -27,3 +27,8 @@ class Player:
 
     def draw_bonus_cards(self):
         pass
+
+
+class AIPlayer:
+    def __init__(self):
+        pass
