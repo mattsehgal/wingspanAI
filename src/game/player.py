@@ -2,7 +2,9 @@ from board import Board
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
+
         self.hand = []
         self.board = Board()
         self.food_tokens = {'slug': 0,
