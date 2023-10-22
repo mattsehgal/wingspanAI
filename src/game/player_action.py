@@ -2,11 +2,11 @@
 
 class Action:
     def __init__(self, n):
-        pass
+        self.n = n
 
 
 class PlayBirdAction(Action):
-    def __init__(self):
+    def execute(self):
         pass
 
 
