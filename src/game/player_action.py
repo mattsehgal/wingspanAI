@@ -1,7 +1,7 @@
 
 
 class Action:
-    def __init__(self):
+    def __init__(self, n):
         pass
 
 
@@ -24,3 +24,7 @@ class DrawCardsAction(Action):
     def __init__(self):
         pass
 
+
+class ExchangeAction(Action):
+    def __init__(self):
+        pass

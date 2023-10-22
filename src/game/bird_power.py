@@ -12,9 +12,8 @@ class DrawBonusPower(BirdPower):
         self.draw_num = draw
         self.keep_num = keep
 
-
     def execute(self, game, player):
-
+        pass
 
 
 class CacheFoodPower(BirdPower):
