@@ -2,15 +2,21 @@
 
 # Base Player Actions
 class Action:
+    def __init__(self, **kwargs):
+        pass
+
     def execute(self, game):
         pass
 
 
 class PlayBirdAction(Action):
+    def __init__(self, **kwargs):
+        pass
+
     def execute(self, game):
         player = game.current_player
-        # args = game.get_player_input(type='play_bird')
-        # player.board.play_bird(args)
+        choice = game.get_player_input(type='play_bird')
+        player.board.play_bird(choice)
 
 
 class GainFoodAction(Action):
@@ -36,7 +42,8 @@ class DrawCardsAction(Action):
 class CacheFoodAction(Action):
     def execute(self, game):
         player = game.current_player
-        # hmm
+        args = game.get_player_input()
+        player.board.current_space.bird.cache(args)
 
 
 class ComplexAction(Action):
@@ -46,22 +53,30 @@ class ComplexAction(Action):
 
 class DiscardAction(Action):
     def execute(self, game):
-        pass
+        player = game.current_player
+        args = game.get_player_input(type='discard')
+        player.board.discard(args)
 
 
 class DrawBonusAction(Action):
     def execute(self, game):
-        pass
+        player = game.current_player
+        game.bonus_deck.draw()  # args from where?
+        DiscardAction().execute(game)
 
 
 class ExchangeAction(Action):
     def execute(self, game):
-        pass
+        player = game.current_player
+        args = game.get_player_input(type='exchange')
+        game.exchange(args)
 
 
 class FlockingAction(Action):
     def execute(self, game):
-        pass
+        player = game.current_player
+        args = game.get_player_input(type='flocking')
+        player.board.current_space.bird.tuck(args)  # or something
 
 
 class GiveToPlayerAction(Action):

@@ -1,27 +1,25 @@
+from actions import *
 from bird_card import BirdCard
 from game import Game
 
 
 class BirdPower:
-    def __init__(self, bird):
+    def __init__(self, bird, **kwargs):
         self.bird = bird
+        self.action = Action(kwargs)
 
     def execute(self, game):
-        pass
+        self.action.execute(game)
 
 
 class DrawBonusPower(BirdPower):
-    def __init__(self, bird, draw, keep):
+    def __init__(self, bird, **kwargs):
         super(bird)
-        self.draw_num = draw
-        self.keep_num = keep
+        self.action = DrawBonusAction(kwargs)
 
     def execute(self, game):
-        player = self.game.current_player
+        self.action.execute()
 
-        for _ in range(self.draw_num):
-            # Holy balls this gets complicated
-            pass
 
 
 class CacheFoodPower(BirdPower):
@@ -30,12 +28,6 @@ class CacheFoodPower(BirdPower):
         self.from_supply = from_supply
 
     def execute(self, game):
-        player = self.game.current_player
-
-        # This might be different in practice
-        if self.from_supply:
-            self.bird.cache += 1
-        # else game.birdfeeder.gain_cache()
 
 
 
