@@ -57,6 +57,6 @@ class Board:
         self.player = player
 
         self.forest = Habitat(GainFoodAction, [1, 1, 2, 2, 3, 3])
-        self.grassland = Habitat(LayEggsAction, [1, 2, 3, 3, 4, 4])
+        self.grassland = Habitat(LayEggsAction, [2, 2, 3, 3, 4, 4])
         self.wetland = Habitat(DrawCardsAction, [1, 1, 2, 2, 3, 3])
 

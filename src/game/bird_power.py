@@ -23,7 +23,6 @@ class DrawBonusPower(BirdPower):
         self.action.execute()
 
 
-
 class CacheFoodPower(BirdPower):
     def __init__(self, bird, from_supply: bool):
         super(bird)
