@@ -24,7 +24,7 @@ class Game:
         players = [Player(name) for name in names]
         return players
 
-    def _set_player_order(self) -> Player:
+    def _set_player_order(self) -> None:
         random.shuffle(self.players)
 
     def _init_bird_deck(self) -> List[BirdCard]:
@@ -35,6 +35,26 @@ class Game:
 
     def _is_game_over(self):
         return self.round_number > self.rounds
+
+    def get_player_input(self, prompt: str) -> str:
+        if prompt == 'gain_food':
+            pass
+            # input(f"{}")
+        elif prompt == 'lay_eggs':
+            pass
+        elif prompt == 'draw_cards':
+            pass
+        elif prompt == 'exchange':
+            pass
+
+        # choose
+            # food to gain
+            # bird to lay egg on
+                # bird to remove egg from (pass negatives to the above?)
+            # where to draw
+            # card to keep
+                # card to discard/tuck
+            # item to exchange
 
     def next_turn(self):
         pass

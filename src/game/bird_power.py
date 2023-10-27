@@ -1,28 +1,37 @@
+from actions import *
+from bird_card import BirdCard
 from game import Game
-from player import Player
 
 
 class BirdPower:
-    def __init__(self, power_text, color):
-        self.power_text = power_text
-        self.color = color
+    def __init__(self, bird, **kwargs):
+        self.bird = bird
+        self.action = Action(kwargs)
 
+    def execute(self, game):
+        self.action.execute(game)
     def __repr__(self):
         return self.power_text + " | " + self.color
 
 
 class DrawBonusPower(BirdPower):
-    def __init__(self, draw, keep):
-        self.draw_num = draw
-        self.keep_num = keep
+    def __init__(self, bird, **kwargs):
+        super(bird)
+        self.action = DrawBonusAction(kwargs)
 
-    def execute(self, game, player):
-        pass
+    def execute(self, game):
+        self.action.execute()
+
 
 
 class CacheFoodPower(BirdPower):
-    def __init__(self):
+    def __init__(self, bird, from_supply: bool):
+        super(bird)
+        self.from_supply = from_supply
+
+    def execute(self, game):
         pass
+
 
 
 class GainFoodPower(BirdPower):

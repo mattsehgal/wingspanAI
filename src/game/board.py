@@ -1,5 +1,5 @@
 from player import Player
-from player_action import *
+from actions import *
 
 from typing import List
 
