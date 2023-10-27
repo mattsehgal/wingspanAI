@@ -3,8 +3,12 @@ from player import Player
 
 
 class BirdPower:
-    def execute(self, game, player):
-        pass
+    def __init__(self, power_text, color):
+        self.power_text = power_text
+        self.color = color
+
+    def __repr__(self):
+        return self.power_text + " | " + self.color
 
 
 class DrawBonusPower(BirdPower):
