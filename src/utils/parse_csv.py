@@ -42,7 +42,7 @@ def get_component_regex(components: List[str]) -> List[str]:
         'from': r'from',
         'group': r'(',
         'if': r'',
-        'item': r'(?P<item>()?\[.*?\]|new bonus cards?)',
+        'item': r'(?P<item>(face-up )?\[.*?\]|new bonus cards?)',
         'location': r'(?P<location>.+?)',
         'n': r'(?P<n>\d+|a|\s|the \d+)',
         'on': r'on',
@@ -71,15 +71,10 @@ def get_component_regex(components: List[str]) -> List[str]:
 
 
 def get_power_regex(power: str) -> str:
-    prefix_phrases = {
-        'all': r'^All players',
-        'discard': r'^Discard',
-        'draw': r'^Draw'
-    }
     power_components = {
         'all': ['action', 'n', 'item', 'group', 'from', 'location', 'or', 'on', 'condition', 'end_group', 'assertion'],
-        'discard': ['n', 'item', 'opt_from_loc', 'to', 'action', 'n', 'item', 'opt_from_loc', 'assertion'],
-        'draw': ['n', 'item', 'opt_from_loc', 'group', 'condition', 'end_group', 'optional', 'assertion'],
+        'discard': ['action', 'n', 'item', 'opt_from_loc', 'to', 'action', 'n', 'item', 'opt_from_loc', 'assertion'],
+        'draw': ['action', 'n', 'item', 'opt_from_loc', 'group', 'condition', 'end_group', 'optional', 'assertion'],
         'each': [],
         'gain': [],
         'if': [],
@@ -97,12 +92,9 @@ def get_power_regex(power: str) -> str:
 
     components = power_components[power]
     component_regex = get_component_regex(components)
-    components.insert(0, None)
-    component_regex.insert(0, prefix_phrases[power])
 
     power_regex = ''
     rstrip_components = ['assertion', 'end_group', 'opt_from_loc', 'optional', 'or']
-
     for component, regex in zip(components, component_regex):
         if component == 'group':
             power_regex += regex
