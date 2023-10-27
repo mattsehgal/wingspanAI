@@ -10,6 +10,8 @@ class BirdPower:
 
     def execute(self, game):
         self.action.execute(game)
+    def __repr__(self):
+        return self.power_text + " | " + self.color
 
 
 class DrawBonusPower(BirdPower):
@@ -28,6 +30,7 @@ class CacheFoodPower(BirdPower):
         self.from_supply = from_supply
 
     def execute(self, game):
+        pass
 
 
 
