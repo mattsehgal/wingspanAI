@@ -38,13 +38,14 @@ class Game:
 
     def get_player_input(self, prompt: str) -> str:
         if prompt == 'gain_food':
-            input(f"{}")
+            pass
+            # input(f"{}")
         elif prompt == 'lay_eggs':
-
+            pass
         elif prompt == 'draw_cards':
-
+            pass
         elif prompt == 'exchange':
-
+            pass
 
         # choose
             # food to gain
@@ -54,9 +55,6 @@ class Game:
             # card to keep
                 # card to discard/tuck
             # item to exchange
-
-
-
 
     def next_turn(self):
         pass
