@@ -9,28 +9,6 @@ load_dotenv()
 bird_csv_path = os.environ['BIRD_CSV']
 bird_df = pd.read_csv(bird_csv_path)
 
-power_regex_map = {
-    'all': r'All players (?P<action1>\w+) (?P<n1>\d+|a|\s) (?P<item1>\[.*?\]) '
-           r'(from (?P<location1>.+)|on (?P<condition1>.+))$',
-
-    'discard': r'^Discard (?P<n1>\d+|a|\s) (?P<item1>\[.*?\])( from (?P<location1>.+?))? to '
-               r'(?P<action2>\w+) (?P<n2>\d+|a|\s) (?P<item2>\[.*?\])( from (?P<location2>.+?))?\.?$',
-
-    'draw': r'',
-    'each': r'',
-    'gain': r'',
-    'if': r'',
-    'lay': r'',
-    'look': r'',
-    'play': r'',
-    'player(s)': r'',
-    'repeat': r'',
-    'roll': r'',
-    'trade': r'',
-    'tuck': r'',
-    'when': r''
-}
-
 
 def get_unique_power_categories(df: pd.DataFrame) -> List[str]:
     uniques = df['power_category'].unique()
@@ -63,9 +41,10 @@ def get_component_regex(components: List[str]) -> List[str]:
         'end_group': r')',
         'from': r'from',
         'group': r'(',
-        'item': r'(?P<item>\[.*?\])',
+        'if': r'',
+        'item': r'(?P<item>()?\[.*?\]|new bonus cards?)',
         'location': r'(?P<location>.+?)',
-        'n': r'(?P<n>\d+|a|\s)',
+        'n': r'(?P<n>\d+|a|\s|the \d+)',
         'on': r'on',
         'opt_from_loc': r'( from (?P<location>.+?))?',
         'optional': r'?',
@@ -95,15 +74,27 @@ def get_power_regex(power: str) -> str:
     prefix_phrases = {
         'all': r'^All players',
         'discard': r'^Discard',
+        'draw': r'^Draw'
+    }
+    power_components = {
+        'all': ['action', 'n', 'item', 'group', 'from', 'location', 'or', 'on', 'condition', 'end_group', 'assertion'],
+        'discard': ['n', 'item', 'opt_from_loc', 'to', 'action', 'n', 'item', 'opt_from_loc', 'assertion'],
+        'draw': ['n', 'item', 'opt_from_loc', 'group', 'condition', 'end_group', 'optional', 'assertion'],
+        'each': [],
+        'gain': [],
+        'if': [],
+        'lay': [],
+        'look': [],
+        'play': [],
+        'player(s)': [],
+        'repeat': [],
+        'roll': [],
+        'trade': [],
+        'tuck': [],
+        'when': []
+
     }
 
-    power_components = {
-        'all': ['action', 'n', 'item', 'group',
-                'from', 'location', 'or', 'on', 'condition', 'end_group', 'assertion'],
-        'discard': ['n', 'item', 'opt_from_loc',
-                    'to', 'action', 'n', 'item', 'opt_from_loc', 'assertion']
-    }
-    
     components = power_components[power]
     component_regex = get_component_regex(components)
     components.insert(0, None)
@@ -111,6 +102,7 @@ def get_power_regex(power: str) -> str:
 
     power_regex = ''
     rstrip_components = ['assertion', 'end_group', 'opt_from_loc', 'optional', 'or']
+
     for component, regex in zip(components, component_regex):
         if component == 'group':
             power_regex += regex
@@ -136,10 +128,9 @@ def parse_bird_powers(df: pd.DataFrame) -> List[str]:
 
 if __name__ == '__main__':
     fw = parse_first_word_dict(bird_df)
-    power = 'discard'
+    power = 'draw'
     regex = get_power_regex(power)
     print(regex)
-    print(power_regex_map[power])
     for text in fw[power]:
         print(text)
         print(regex_group_dict(text, regex))
