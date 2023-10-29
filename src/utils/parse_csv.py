@@ -35,24 +35,24 @@ def parse_first_word_dict(df: pd.DataFrame) -> Dict[str, List[str]]:
 
 def get_component_regex(components: List[str]) -> List[str]:
     component_regex = {
-        'action': r'(?P<action>\w+)',
-        'assertion': r'\.?$',
-        'condition': r'(?P<condition>.+)',
+        'action': r'(?P<action>play|gain|lay|draw|discard|tuck)',
+        'assertion': r'\.$',
+        'condition': r'(?P<condition>you may)',
         'end_group': r')',
-        'from': r'from',
+        'entailment': r'(?P<entailment> ?to ?)',
         'group': r'(',
         'if': r'',
         'item': r'(?P<item>(face-up )?\[.*?\]|new bonus cards?)',
-        'location': r'(?P<location>.+?)',
-        'n': r'(?P<n>\d+|a|\s|the \d+)',
+        'literal_or': r'or',
+        'location': r'(?: ?(from|on|that are in) (?P<location>.+?))',
+        'n': r'(?P<n>(?:\d+|a|all|any \d+|the \d+|\s))',
         'on': r'on',
-        'opt_from_loc': r'( from (?P<location>.+?))?',
         'optional': r'?',
         'or': r'|',
-        'to': r'to',
+        'players': r'(?P<players>\w+) players?'
     }
 
-    increment = ['action', 'condition', 'item', 'location', 'n', 'opt_from_loc']
+    increment = ['action', 'condition', 'item', 'location', 'n']
 
     component_count = {}
     patterns = []
@@ -60,8 +60,6 @@ def get_component_regex(components: List[str]) -> List[str]:
     for component in components:
         pattern = component_regex[component]
         if component in increment:
-            if component == 'opt_from_loc':
-                component = 'location'
             component_count[component] = component_count.get(component, 0) + 1
             pattern = pattern.replace('<'+component+'>',
                                       '<'+component+str(component_count[component])+'>')
@@ -72,11 +70,26 @@ def get_component_regex(components: List[str]) -> List[str]:
 
 def get_power_regex(power: str) -> str:
     power_components = {
-        'all': ['action', 'n', 'item', 'group', 'from', 'location', 'or', 'on', 'condition', 'end_group', 'assertion'],
-        'discard': ['action', 'n', 'item', 'opt_from_loc', 'to', 'action', 'n', 'item', 'opt_from_loc', 'assertion'],
-        'draw': ['action', 'n', 'item', 'opt_from_loc', 'group', 'condition', 'end_group', 'optional', 'assertion'],
+        # DONE
+        'all': ['players', 'action', 'n', 'item', 'location',
+                'group', 'condition', 'action', 'n', 'item', 'location', 'end_group', 'optional',
+                'assertion'],
+        # DONE
+        'discard': ['action', 'n', 'item', 'location', 'optional',  # Discard n item (from/on/that are in location)?
+                    'entailment',                                   # to
+                    'action', 'n', 'item', 'location', 'optional',  # action n item (from/on/that are in location)?
+                    'assertion'],
+
+        'draw': ['action', 'n', 'item', 'location', 'optional',  # Draw n card (from location)?
+                 'group', 'condition', 'end_group', 'optional',  # (condition)?
+                 'assertion'],
+
         'each': [],
-        'gain': [],
+
+        'gain': ['action', 'n', 'item',                                   # Gain n food1
+                 'group', 'literal_or', 'item', 'end_group', 'optional',  # (or food2)?
+                 'location', 'optional',                                  # from?
+                 'assertion'],
         'if': [],
         'lay': [],
         'look': [],
@@ -94,15 +107,17 @@ def get_power_regex(power: str) -> str:
     component_regex = get_component_regex(components)
 
     power_regex = ''
-    rstrip_components = ['assertion', 'end_group', 'opt_from_loc', 'optional', 'or']
+    optional_space_components = ['n']
+    rstrip_components = ['assertion', 'end_group', 'group', 'location', 'optional', 'or']
     for component, regex in zip(components, component_regex):
-        if component == 'group':
-            power_regex += regex
+        if component in optional_space_components:
+            power_regex = power_regex.rstrip()
+            power_regex += '\s?'+regex+'\s?'
         elif component in rstrip_components:
             power_regex = power_regex.rstrip()
-            power_regex += regex+' ' if component not in ['or'] else regex
+            power_regex += regex+' ' if component not in ['optional', 'or'] else regex
         else:
-            power_regex += regex+' '
+            power_regex += regex+' ' if component not in ['group'] else regex
 
     return power_regex.rstrip()
 
@@ -111,7 +126,12 @@ def regex_group_dict(text: str, regex: str) -> Optional[Dict[str, AnyStr]]:
     pattern = re.compile(regex, re.IGNORECASE)
     match = pattern.match(text)
 
-    return match.groupdict() if match else None
+    match_dict = match.groupdict() if match else None
+
+    if match_dict and 'entailment' in match_dict:
+        match_dict['entailment'] = True
+
+    return match_dict
 
 
 def parse_bird_powers(df: pd.DataFrame) -> List[str]:
@@ -120,11 +140,20 @@ def parse_bird_powers(df: pd.DataFrame) -> List[str]:
 
 if __name__ == '__main__':
     fw = parse_first_word_dict(bird_df)
-    power = 'draw'
+    power = 'all'
     regex = get_power_regex(power)
     print(regex)
     for text in fw[power]:
         print(text)
         print(regex_group_dict(text, regex))
+        print()
 
     print('')
+
+"""NOTES
+
+all/each/... need to be folded into player component
+draw needs to be solved fully for short text and brant
+gain needs literals? or at least literal "or"
+
+"""
