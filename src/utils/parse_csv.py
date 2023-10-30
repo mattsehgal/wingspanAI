@@ -35,24 +35,25 @@ def parse_first_word_dict(df: pd.DataFrame) -> Dict[str, List[str]]:
 
 def get_component_regex(components: List[str]) -> List[str]:
     component_regex = {
-        'action': r'(?P<action>play|gain|lay|draw|cache|discard|keep|tuck)',
+        'action': r'(?P<action>play|gain|lay|draw|cache|discard|keep|look at|trade|tuck)',
         'assertion': r'\.$',
         'condition': r'(?P<condition>at .+?)',
+        'else': r'if not,',
         'end_group': r')',
-        'entailment': r'(?P<entailment>\s?(and|to|if you do,|you may)\s?)',
+        'entailment': r'(?P<entailment>\s?(and|to|if you do,( also)?|you may)\s?)',
         'group': r'(',
-        'if': r'',
+        'if_ws': r'if (?P<if_ws>(\<|\>)\d+cm,)',
         'item': r'(?P<item>(face-up )?(?:\[.+?\]|it|new bonus cards?))\.?',
         'literal_or': r'or',
-        'location': r'(?:\s?(from|in|on|that are in) (?P<location>.+?))',
-        'n': r'(?P<n>(?:\d+|a|all|any \d+|the \d+|\s))',
+        'location': r'(?:\s?(behind|from|in|on|that are in|under) (?P<location>.+?))',
+        'n': r'(?P<n>(?:\d+|a|all|any \d+|for any other|the \d+|\s))',
         'on': r'on',
         'optional': r'?',
         'or': r'|',
         'players': r'(?P<players>\w+) players?'
     }
 
-    increment = ['action', 'condition', 'entailment', 'item', 'location', 'n']
+    increment = ['action', 'condition', 'entailment', 'if_ws', 'item', 'location', 'n']
 
     component_count = {}
     patterns = []
@@ -71,44 +72,65 @@ def get_component_regex(components: List[str]) -> List[str]:
 def get_power_regex(power: str) -> str:
     power_components = {
         # DONE
-        'all': ['players', 'action', 'n', 'item', 'location',    # Players action n item from/on location
-                'group',                                         # (
-                'condition', 'action', 'n', 'item', 'location',  # (condition action n item from/on location)?
-                'end_group', 'optional',                         # )?
-                'assertion'],
+        # players action n item location (-> action n item location)?
+        'all': ['players', 'action', 'n', 'item', 'location',
+                'group', 'entailment', 'action', 'n', 'item', 'location',
+                'end_group', 'optional', 'assertion'],
         # DONE
-        'discard': ['action', 'n', 'item', 'location', 'optional',  # Discard n item (from/on location)?
-                    'entailment',                                   # in order to
-                    'action', 'n', 'item', 'location', 'optional',  # action n item (from/on location)?
+        # action n item location? -> action n item location?
+        'discard': ['action', 'n', 'item', 'location', 'optional',
+                    'entailment',
+                    'action', 'n', 'item', 'location', 'optional',
                     'assertion'],
-        # DONE (could maybe be prettier)
+        # DONE
+        # action n item location? (-> action n (item location condition)?)?
         'draw': ['action', 'n', 'item', 'location', 'optional',
-                 'group',
-                 'entailment', 'action', 'n',
-                 'group',
-                 'item', 'location', 'condition',
-                 'end_group', 'optional',
-                 'end_group', 'optional',
+                 'group', 'entailment', 'action', 'n',
+                 'group', 'item', 'location', 'condition',
+                 'end_group', 'optional', 'end_group', 'optional',
                  'assertion'],
 
         'each': [],
-        # DONE TODO verify
+        # DONE
+        # action n item (or item)? location (-> action n item location)?
         'gain': ['action', 'n', 'item',
                  'group', 'literal_or', 'item', 'end_group', 'optional',
                  'location',
-                 'group', 'entailment', 'action', 'n', 'item', 'location', 'end_group', 'optional',
-                 'assertion'],
+                 'group', 'entailment', 'action', 'n', 'item', 'location',
+                 'end_group', 'optional', 'assertion'],
+        # TODO
+        #
         'if': [],
-        'lay': [],
-        'look': [],
+        # DONE
+        # action n item location
+        'lay': ['action', 'n', 'item', 'location', 'assertion'],
+        # DONE
+        # look_deck if_ws action item location else action item
+        'look': ['action', 'n', 'item', 'location',
+                 'if_ws', 'action', 'item', 'location',
+                 'else', 'action', 'item', 'assertion'],
+        # TODO
+        #
         'play': [],
+        # TODO
+        #
         'player(s)': [],
+        # TODO
+        #
         'repeat': [],
+        # TODO
+        #
         'roll': [],
-        'trade': [],
-        'tuck': [],
+        # DONE
+        # action n item n item location
+        'trade': ['action', 'n', 'item', 'n', 'item', 'location', 'assertion'],
+        # DONE
+        # action n item location -> action n item location?
+        'tuck': ['action', 'n', 'item', 'location', 'entailment',
+                 'action', 'n', 'item', 'location', 'optional', 'assertion'],
+        # TODO
+        #
         'when': []
-
     }
 
     components = power_components[power]
@@ -145,20 +167,18 @@ def parse_bird_powers(df: pd.DataFrame) -> List[str]:
 
 if __name__ == '__main__':
     fw = parse_first_word_dict(bird_df)
-    power = 'gain'
-    regex = get_power_regex(power)
-    print(regex)
-    for text in fw[power]:
-        print(text)
-        print(regex_group_dict(text, regex))
-        print()
+    powers = ['all', 'discard', 'draw', 'gain', 'lay', 'look', 'trade', 'tuck']
+    for power in powers:
+        regex = get_power_regex(power)
+        print(regex)
+        for text in fw[power]:
+            print(text)
+            print(regex_group_dict(text, regex))
+            print()
 
-    print('')
+        print('')
 
 """NOTES
 
-all/each/... need to be folded into player component
-draw needs to be solved fully for short text and brant
-gain needs literals? or at least literal "or"
-
+all/each/... need to be folded into players component
 """
