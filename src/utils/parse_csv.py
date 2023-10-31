@@ -145,7 +145,7 @@ def get_power_regex(power: str) -> str:
                  'assertion'],
 
     }
-
+    power = power.lower()
     components = power_components[power]
     component_regex = get_component_regex(components)
 
@@ -174,22 +174,25 @@ def regex_group_dict(text: str, regex: str) -> Optional[Dict[str, AnyStr]]:
     return match_dict
 
 
-def parse_bird_powers(df: pd.DataFrame) -> List[str]:
-    first_word_map = parse_first_word_dict(df)
+def parse_bird_powers(df: pd.DataFrame):
+    fw_map = parse_first_word_dict(df)
+    # df['parsed_power_text'] =
+    re_list = [regex_group_dict(text, get_power_regex(power))
+               for power in fw_map.keys() for text in fw_map[power]]
+    return re_list
 
 
 if __name__ == '__main__':
-    fw = parse_first_word_dict(bird_df)
-    powers = [key.lower() for key in fw.keys()]
-    for power in powers:
-        regex = get_power_regex(power)
-        print(regex)
-        for text in fw[power]:
-            print(text)
-            print(regex_group_dict(text, regex))
-            print()
-
-        print('')
+    re_list = parse_bird_powers(bird_df)
+    print(re_list)
+    # fw = parse_first_word_dict(bird_df)
+    # powers = [key.lower() for key in fw.keys()]
+    # for power in powers:
+    #     regex = get_power_regex(power)
+    #     print(regex)
+    #     for text in fw[power]:
+    #         print(text)
+    #         print(regex_group_dict(text, regex))
 
 """NOTES
 

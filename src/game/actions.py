@@ -1,3 +1,4 @@
+from typing import AnyStr, Dict, List
 
 
 # Base Player Actions
@@ -59,10 +60,14 @@ class DiscardAction(Action):
 
 
 class DrawBonusAction(Action):
+    def __init__(self, draw_n, discard_n):
+        self.draw_n = draw_n
+        self.discard_n = discard_n
+
     def execute(self, game):
         player = game.current_player
-        game.bonus_deck.draw()  # args from where?
-        DiscardAction().execute(game)
+        game.bonus_deck.draw(self.draw_n)
+        player.discard(item='bonus', n=self.discard_n)
 
 
 class ExchangeAction(Action):
@@ -93,3 +98,19 @@ class RepeatPowerAction(Action):
     def execute(self, game):
         pass
 
+
+class ActionSequence:
+    def __init__(self, actions: List[Action]):
+        self.actions = actions
+
+    def execute(self, game):
+        for action in self.actions:
+            action.execute(game)
+
+
+# class ActionFactory:
+#     def __init__(self):
+#         pass
+#
+#     def create(self, action: str, args: Dict[str, AnyStr]) -> Action:
+#         pass
