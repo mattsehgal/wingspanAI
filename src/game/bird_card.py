@@ -1,10 +1,11 @@
 from bird_power import BirdPower, BirdPowerFactory
 
-from typing import Dict, List
+from typing import Dict, Optional, Union
 
 
 class BirdCard:
-    def __init__(self, bird_card: Dict[str, str]):
+    def __init__(self, bird_card: Dict[str, Optional[Union[int, str]]]):
+        self.id = bird_card['id']
         self.name = bird_card['common_name']
         self.habitat = {
             'forest': bird_card['forest'],
@@ -17,7 +18,10 @@ class BirdCard:
         self.color = bird_card['color']
         self.power = self._init_power(bird_card)
         self.egg_capacity = bird_card['egg_capacity']
-        self.nest_type = self.bird_card['nest_type']
+        self.nest_type = bird_card['nest_type']
+
+        # testing only
+        self.power_text = bird_card['power_text']
 
     def _init_food_cost(self, bird_card) -> str:
         if bird_card['food_slash']:
@@ -39,4 +43,6 @@ class BirdCard:
 
     def _init_power(self, bird_card) -> BirdPower:
         args = bird_card['power_args']
-        return BirdPowerFactory().create(args)
+        if args is None:
+            args = {}
+        return BirdPowerFactory(bird_card['id']).create(**args)

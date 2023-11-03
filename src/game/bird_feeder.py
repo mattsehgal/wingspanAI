@@ -1,8 +1,5 @@
 import random
 
-from player import Player
-from game import Game
-
 from typing import List
 
 

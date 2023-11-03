@@ -1,8 +1,9 @@
 import random
 
-#from bird_card import BirdCard
+from bird_card import BirdCard
 from bonus_card import BonusCard
 from player import Player
+from state import *
 
 from typing import Dict, List
 
@@ -19,6 +20,9 @@ class Game:
         self.round_number = 1
         self.rounds = 4
 
+        self.state = self._get_state()
+        self.previous_states = []
+
     @staticmethod
     def _init_players(names) -> List[Player]:
         players = [Player(name) for name in names]
@@ -32,6 +36,9 @@ class Game:
 
     def _init_bonus_deck(self) -> List[BonusCard]:
         pass
+
+    def _get_state(self) -> GameState:
+        return GameState(self)
 
     def _is_game_over(self):
         return self.round_number > self.rounds
