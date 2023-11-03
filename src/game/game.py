@@ -1,6 +1,6 @@
 import random
 
-from bird_card import BirdCard
+#from bird_card import BirdCard
 from bonus_card import BonusCard
 from player import Player
 

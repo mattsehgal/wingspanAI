@@ -38,7 +38,7 @@ class DrawCardsPower(BirdPower):
         return ActionSequence([])
 
     def execute(self, game):
-        self.actions.execute()
+        pass
 
 
 class DrawBonusPower(BirdPower):
