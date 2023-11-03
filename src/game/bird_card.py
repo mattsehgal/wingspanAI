@@ -1,61 +1,42 @@
-import pandas as pd
-from typing import List
-from bird_power import BirdPower
+from bird_power import BirdPower, BirdPowerFactory
+
+from typing import Dict, List
 
 
 class BirdCard:
-    def __init__(self, birdCard):
-        self.name = self._init_name(birdCard)
-        self.habitat = self._init_habitat(birdCard)
-        self.food_cost = self._init_food_cost(birdCard)
-        self.points = self._init_points(birdCard)
-        self.wingspan = self._init_wingspan(birdCard)
-        self.color = self._init_color(birdCard)
-        self.power = self._init_power(birdCard)
-        self.egg_capacity = self._init_egg_capacity(birdCard)
-        self.nest_type = self._init_nest_type(birdCard)
+    def __init__(self, bird_card: Dict[str, str]):
+        self.name = bird_card['common_name']
+        self.habitat = {
+            'forest': bird_card['forest'],
+            'grassland': bird_card['grassland'],
+            'wetland': bird_card['wetland']
+        }
+        self.food_cost = self._init_food_cost(bird_card)
+        self.points = bird_card['victory_points']
+        self.wingspan = bird_card['wingspan']
+        self.color = bird_card['color']
+        self.power = self._init_power(bird_card)
+        self.egg_capacity = bird_card['egg_capacity']
+        self.nest_type = self.bird_card['nest_type']
 
-    def _init_name(self, birdCard) -> str:
-        return birdCard['common_name']
-
-    def _init_habitat(self, birdCard) -> List[bool]:
-        return {'forest': birdCard['forest'], 'grassland': birdCard['grassland'], 'wetland': birdCard['wetland']}
-
-    def _init_food_cost(self, birdCard) -> str:
-        if birdCard['food_slash']:
-            food_cost = ("slug/" * birdCard['invertebrate'] +
-                         "wheat/" * birdCard['seed'] +
-                         "berry/" * birdCard['fruit'] +
-                         "rat/" * birdCard['rodent'] +
-                         "fish/" * birdCard['fish']
+    def _init_food_cost(self, bird_card) -> str:
+        if bird_card['food_slash']:
+            food_cost = ("slug/" * bird_card['invertebrate'] +
+                         "wheat/" * bird_card['seed'] +
+                         "berry/" * bird_card['fruit'] +
+                         "rat/" * bird_card['rodent'] +
+                         "fish/" * bird_card['fish']
                          )
         else:
-            food_cost = ("slug+" * birdCard['invertebrate'] +
-                         "wheat+" * birdCard['seed'] +
-                         "berry+" * birdCard['fruit'] +
-                         "rat+" * birdCard['rodent'] +
-                         "fish+" * birdCard['fish'] +
-                         "wild+" * birdCard['wild_(food)']
+            food_cost = ("slug+" * bird_card['invertebrate'] +
+                         "wheat+" * bird_card['seed'] +
+                         "berry+" * bird_card['fruit'] +
+                         "rat+" * bird_card['rodent'] +
+                         "fish+" * bird_card['fish'] +
+                         "wild+" * bird_card['wild_(food)']
                          )
         return food_cost[:-1]
 
-    def _init_points(self, birdCard) -> int:
-        return birdCard['victory_points']
-
-    def _init_power(self, birdCard):
-        return BirdPower(birdCard['power_text'], self.color)
-
-    def _init_wingspan(self, birdCard) -> int:
-        return birdCard['wingspan']
-
-    def _init_color(self, birdCard) -> str:
-        return birdCard['color']
-
-    def _init_egg_capacity(self, birdCard) -> int:
-        return birdCard['egg_capacity']
-
-    def _init_nest_type(self, birdCard) -> str:
-        return birdCard['nest_type']
-
-    def __repr__(self) -> str:
-        return self.name + "\n" + self.food_cost + "\n" + str(self.points) + "\n" + self.power + "\n"
+    def _init_power(self, bird_card) -> BirdPower:
+        args = bird_card['power_args']
+        return BirdPowerFactory().create(args)

@@ -1,3 +1,5 @@
+import os
+from src.utils.parse_csv import parse_csv
 import random
 import pandas as pd
 from typing import List
@@ -5,16 +7,17 @@ from bird_card import BirdCard
 
 
 class Deck:
-
     def __init__(self):
         self.deck = self._init_deck()
-        self.tray = self.deck[:3]
+        self.tray = {bird_card.id: bird_card for bird_card in self.deck[:3]}
         self.deck = self.deck[3:]
 
-    def _init_deck(self) -> List[BirdCard]:
-        df = pd.read_csv('/kaggle/input/wingspan-base-game-birds-cleaned/BaseGameBirds.csv')
-        df['color'] = df['color'].fillna('None')
-        df['power_text'] = df['power_text'].fillna('')
+    @staticmethod
+    def _init_deck() -> List[BirdCard]:
+        # df = pd.read_csv('/kaggle/input/wingspan-base-game-birds-cleaned/BaseGameBirds.csv')
+        df = parse_csv()
+        for idx, row in df.iterrows():
+            print(row)
         deck = [BirdCard(row) for index, row in df.iterrows()]
         random.shuffle(deck)
         return deck
@@ -27,10 +30,10 @@ class Deck:
         else:
             return None  # Return None if the deck is empty
 
-    def draw_from_tray(self, position: int) -> BirdCard:
+    def draw_from_tray(self, bird_id: int) -> BirdCard:
         """Draws a card from the tray based on position (0, 1, or 2)."""
-        if 0 <= position < len(self.tray):
-            drawn_card = self.tray.pop(position)
+        if bird_id in self.tray:
+            drawn_card = self.tray.pop(bird_id)
             return drawn_card
         else:
             return None  # Return None for invalid position
@@ -51,8 +54,7 @@ class Deck:
             string += card.__string__() + "\n"
         return string
 
-    def trayToString(self) -> str:
-        string = "Tray:\n"
-        for card in self.tray:
-            string += card.__string__() + "\n"
-        return string
+
+if __name__ == '__main__':
+    deck = Deck()
+    print(deck)
