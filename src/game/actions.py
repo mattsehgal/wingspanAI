@@ -1,49 +1,66 @@
+from game import Game
+from state import *
+
 from typing import AnyStr, Dict, List
 
 
 # Base Player Actions
 class Action:
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, args: Dict[str, str] = {}):
+        self.args = args
 
-    def execute(self, game):
-        pass
+    def execute(self, game: Game) -> bool:
+        return False
 
 
 class PlayBirdAction(Action):
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self):
+        self.type = 'play_bird'
 
-    def execute(self, game):
+    def execute(self, game: Game) -> bool:
         player = game.current_player
-        choice = game.get_player_input(type='play_bird')
-        player.board.play_bird(choice)
-
+        choice = game.get_player_input(self.type)
+        bird_id = choice['bird_id']
+        player.play_bird(bird_id)
 
 class GainFoodAction(Action):
+    def __init__(self):
+        self.type = 'gain_food'
+
     def execute(self, game):
         player = game.current_player
-        # args = game.get_player_input(type='gain_food')
-        # player.board.gain_food(args)
+        choice = game.get_player_input(self.type, args=self.args)
+        player.board.gain_food(choice)
 
 
 class LayEggsAction(Action):
+    def __init__(self):
+        self.type = 'lay_eggs'
+
     def execute(self, game):
-        # see above
-        pass
+        player = game.current_player
+        choice = game.get_player_input(self.type, args=self.args)
+        player.board.lay_eggs(choice)
 
 
 class DrawCardsAction(Action):
+    def __init__(self):
+        self.type = 'draw_cards'
+
     def execute(self, game):
-        # see above
-        pass
+        player = game.current_player
+        choice = game.get_player_input(self.type, args=self.args)
+        player.draw_bird_cards(choice)
 
 
 # Other Actions
 class CacheFoodAction(Action):
+    def __init__(self):
+        self.type = 'cache_food'
+
     def execute(self, game):
         player = game.current_player
-        args = game.get_player_input()
+        choice = game.get_player_input(self.type, args=self.args)
         player.board.current_space.bird.cache(args)
 
 
