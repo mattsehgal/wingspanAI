@@ -4,41 +4,17 @@ from game import Game
 
 
 class BirdPower:
-    def __init__(self, bird, **kwargs):
+    def __init__(self, bird: BirdCard, actions: ActionSequence):
         self.bird = bird
-        self.action = Action(kwargs)
+        self.actions = actions
 
     def execute(self, game):
-        self.action.execute(game)
-
-
-class DrawBonusPower(BirdPower):
-    def __init__(self, bird, **kwargs):
-        super(bird)
-        self.actions = self._parse_kwargs_to_actions(**kwargs)
-#{'action1': 'draw', 'n1': '2', 'item1': 'new bonus cards', 'location1': None, 'entailment1': 'and', 'action2': 'keep', 'n2': '1', 'item2': None, 'location2': None, 'condition1': None}
-    def _parse_kwargs_to_actions(self, **kwargs) -> ActionSequence:
-        n1 = kwargs.get('n1', None)
-        n2 = kwargs.get('n2', None)
-        action1 = DrawBonusAction(n1, n2)
-        return ActionSequence([action1])
-
-    def execute(self, game):
-        self.actions.execute()
-
-
-class CacheFoodPower(BirdPower):
-    def __init__(self, bird, from_supply: bool):
-        super(bird)
-        self.from_supply = from_supply
-
-    def execute(self, game):
-
+        self.actions.execute(game)
 
 
 class GainFoodPower(BirdPower):
-    def __init__(self):
-        pass
+    def execute(self, game):
+        self.actions.execute(game)
 
 
 class LayEggsPower(BirdPower):
@@ -47,7 +23,37 @@ class LayEggsPower(BirdPower):
 
 
 class DrawCardsPower(BirdPower):
-    def __init__(self):
+    def __init__(self, bird, **kwargs):
+        super(bird)
+        self.actions = self._parse_kwargs_to_actions(**kwargs)
+
+    def _parse_kwargs_to_actions(self, **kwargs) -> ActionSequence:
+        n1 = kwargs.get('n1', None)
+        location1 = kwargs.get('location1', None)
+        entailment1 = kwargs.get('entailment1', None)
+
+        if entailment1:
+            pass
+
+        return ActionSequence([])
+
+    def execute(self, game):
+        self.actions.execute()
+
+
+class DrawBonusPower(BirdPower):
+    def __init__(self, bird, actions):
+        super(bird, actions)
+
+    def execute(self, game):
+        self.actions.execute()
+
+
+class CacheFoodPower(BirdPower):
+    def __init__(self, bird, actions):
+        super(bird, actions)
+
+    def execute(self, game):
         pass
 
 
@@ -75,23 +81,39 @@ class BirdPowerFactory:
     def __init__(self):
         pass
 
-    def _build_draw_bonus(self, **kwargs) -> DrawBonusPower:
-        power = DrawBonusPower()
-
-    def _build_draw_cards(self, **kwargs) -> DrawCardsPower:
+    def _build_cache_food(self, **kwargs) -> CacheFoodPower:
         pass
 
+    def _build_draw_bonus(self, **kwargs) -> DrawBonusPower:
+        n1 = kwargs.get('n1', None)
+        n2 = kwargs.get('n2', None)
+        actions = ActionSequence([DrawBonusAction(draw_n=n1, discard_n=n2)])
+
+        return DrawBonusPower(actions)
+
+    def _build_draw_cards(self, **kwargs) -> DrawCardsPower:
+        n1 = kwargs.get('n1', None)
+        location1 = kwargs.get('location1', None)
+
+
     def create(self, **kwargs) -> BirdPower:
-        power = None
-
         action1 = kwargs.get('action1', None)
+        # Actions: cache|discard|draw|gain|keep|lay|look at|move|play|repeat|roll|trade|tuck
+        match action1:
+            case 'cache':
+                return self._build_cache_food(**kwargs)
 
-        if action1 == 'draw':
-            item1 = kwargs.get('item1', None)
+            case 'draw':
+                item1 = kwargs.get('item1', None)
+                if 'bonus' in item1:
+                    return self._build_draw_bonus(**kwargs)
+                else:
+                    return self._build_draw_cards(**kwargs)
 
-            if 'bonus' in item1:
-                return self._build_draw_bonus(**kwargs)
-            else:
-                return self.
+            case 'play':
+                return self._build_play_addtional_bird(**kwargs)
+
+
+
 
 # parse_csv:parse_bird_powers() -> ... -> BirdPower -> ActionFactory:create(action, args) -> Action

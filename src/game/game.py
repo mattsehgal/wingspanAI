@@ -4,7 +4,7 @@ from bird_card import BirdCard
 from bonus_card import BonusCard
 from player import Player
 
-from typing import List
+from typing import Dict, List
 
 
 class Game:
@@ -36,7 +36,7 @@ class Game:
     def _is_game_over(self):
         return self.round_number > self.rounds
 
-    def get_player_input(self, prompt: str) -> str:
+    def get_player_input(self, prompt: str, args: Dict[str, str] = {}) -> str:
         if prompt == 'gain_food':
             pass
             # input(f"{}")

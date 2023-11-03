@@ -18,7 +18,7 @@ class FoodDie:
         return face
 
 
-class Birdfeeder:
+class BirdFeeder:
     def __init__(self):
         self.dice_in = self._init_dice()
         self.dice_out = []
