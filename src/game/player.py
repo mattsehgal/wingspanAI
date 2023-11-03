@@ -1,12 +1,14 @@
-#from board import Board
+from board import Board
+from deck import Deck
 
 from typing import Dict, List, Union
 
 
 class Player:
-    def __init__(self, name):
-        # deck!
+    def __init__(self, name: str, deck: Deck):
         self.name = name
+
+        self.deck = deck
 
         self.bird_cards = []
         self.bonus_cards = []
@@ -36,7 +38,9 @@ class Player:
 
     def draw_bird_cards(self, card_choice: Dict[Union[str, int], int]):
         for card, n in card_choice.items():
-
+            # If card is id, draw from tray
+            if isinstance(card, int):
+                self.deck.draw_from_tray()
 
 
     def draw_bonus_cards(self):

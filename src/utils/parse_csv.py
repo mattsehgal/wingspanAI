@@ -21,6 +21,10 @@ def parse_first_word_dict(df: pd.DataFrame) -> Dict[str, List[str]]:
 
     for text in power_list:
         if not isinstance(text, str):
+            if 'none' in res_dict:
+                res_dict['none'].append('')
+            else:
+                res_dict['none'] = ['']
             continue
 
         text = text.lower()
@@ -174,16 +178,27 @@ def regex_group_dict(text: str, regex: str) -> Optional[Dict[str, AnyStr]]:
     return match_dict
 
 
-def parse_bird_powers(df: pd.DataFrame):
-    fw_map = parse_first_word_dict(df)
+def parse_bird_powers():
+    fw_map = parse_first_word_dict(bird_df)
+    print(sum([len(sublist) for _, sublist in fw_map.items()]))
     # df['parsed_power_text'] =
     re_list = [regex_group_dict(text, get_power_regex(power))
-               for power in fw_map.keys() for text in fw_map[power]]
+               if power != 'none' else {}
+               for power in fw_map.keys()
+               for text in fw_map[power]]
     return re_list
 
 
+def parse_csv() -> pd.DataFrame:
+    bird_df['power_args'] = parse_bird_powers()
+    bird_df['color'] = bird_df['color'].fillna('None')
+    bird_df['power_text'] = bird_df['power_text'].fillna('')
+    return bird_df
+
+
 if __name__ == '__main__':
-    re_list = parse_bird_powers(bird_df)
+    birds = parse_csv()
+    re_list = parse_bird_powers()
     print(re_list)
     # fw = parse_first_word_dict(bird_df)
     # powers = [key.lower() for key in fw.keys()]

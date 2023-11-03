@@ -1,4 +1,3 @@
-from game import Game
 from state import *
 
 from typing import AnyStr, Dict, List
@@ -22,6 +21,7 @@ class PlayBirdAction(Action):
         choice = game.get_player_input(self.type)
         bird_id = choice['bird_id']
         player.play_bird(bird_id)
+
 
 class GainFoodAction(Action):
     def __init__(self):

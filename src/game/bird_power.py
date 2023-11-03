@@ -1,6 +1,5 @@
 from actions import *
 from bird_card import BirdCard
-from game import Game
 
 
 class BirdPower:
@@ -95,23 +94,21 @@ class BirdPowerFactory:
         n1 = kwargs.get('n1', None)
         location1 = kwargs.get('location1', None)
 
-
     def create(self, **kwargs) -> BirdPower:
         action1 = kwargs.get('action1', None)
         # Actions: cache|discard|draw|gain|keep|lay|look at|move|play|repeat|roll|trade|tuck
-        match action1:
-            case 'cache':
-                return self._build_cache_food(**kwargs)
+        if action1 == 'cache':
+            return self._build_cache_food(**kwargs)
 
-            case 'draw':
-                item1 = kwargs.get('item1', None)
-                if 'bonus' in item1:
-                    return self._build_draw_bonus(**kwargs)
-                else:
-                    return self._build_draw_cards(**kwargs)
+        elif action1 == 'draw':
+            item1 = kwargs.get('item1', None)
+            if 'bonus' in item1:
+                return self._build_draw_bonus(**kwargs)
+            else:
+                return self._build_draw_cards(**kwargs)
 
-            case 'play':
-                return self._build_play_addtional_bird(**kwargs)
+        elif action1 == 'play':
+            return self._build_play_addtional_bird(**kwargs)
 
 
 

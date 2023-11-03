@@ -1,4 +1,3 @@
-from player import Player
 from actions import *
 
 from typing import List
@@ -46,8 +45,8 @@ class Habitat:
 
 
 class Board:
-    def __init__(self, player):
-        self.player = player
+    def __init__(self, player_id: int):
+        self.player_id = player_id
 
         self.forest = Habitat(GainFoodAction, [1, 1, 2, 2, 3, 3])
         self.grassland = Habitat(LayEggsAction, [2, 2, 3, 3, 4, 4])
@@ -55,6 +54,6 @@ class Board:
 
         self.habitats = {'forest': self.forest, 'grassland': self.grassland, 'wetland': self.wetland}
 
-    def play_bird(self, bird: BirdCard, habitat: str):
+    def play_bird(self, bird, habitat: str):
         self.habitats[habitat]
 
