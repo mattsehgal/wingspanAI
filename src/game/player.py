@@ -5,7 +5,8 @@ from typing import Dict, List, Union
 
 
 class Player:
-    def __init__(self, name: str, deck: Deck):
+    def __init__(self, _id: int, name: str, deck: Deck):
+        self.id = _id
         self.name = name
 
         self.deck = deck
