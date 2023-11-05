@@ -1,5 +1,6 @@
 import random
 
+from bird_feeder import BirdFeeder
 from bird_card import BirdCard
 from bonus_card import BonusCard
 from player import Player
@@ -13,6 +14,8 @@ class Game:
         self.players = self._init_players(player_names)
         self._set_player_order()
         self.current_player = self.players[0]
+
+        self.bird_feeder = BirdFeeder()
 
         self.bird_deck = self._init_bird_deck()
         self.bonus_deck = self._init_bonus_deck()
@@ -38,7 +41,13 @@ class Game:
         pass
 
     def _get_state(self) -> GameState:
-        return GameState(self)
+        return GameState(
+            curr_player_id=self.current_player.id,
+            component_states={'bird_feeder': self.bird_feeder.state,
+                              'bird_deck': self.bird_deck.state},
+            player_states={player.id: player.state
+                           for player in self.players}
+        )
 
     def _is_game_over(self):
         return self.round_number > self.rounds

@@ -1,4 +1,5 @@
 from bird_power import BirdPower, BirdPowerFactory
+from state import BirdState
 
 from typing import Dict, Optional, Union
 
@@ -12,6 +13,7 @@ class BirdCard:
             'grassland': bird_card['grassland'],
             'wetland': bird_card['wetland']
         }
+        self.played_habitat = None
         self.food_cost = self._init_food_cost(bird_card)
         self.points = bird_card['victory_points']
         self.wingspan = bird_card['wingspan']
@@ -43,14 +45,15 @@ class BirdCard:
                          )
         return food_cost[:-1]
 
-    def _init_power(self, bird_card) -> BirdPower:
-        args = bird_card['power_args']
+    @staticmethod
+    def _init_power(bird_card_dict: Dict[str, str]) -> BirdPower:
+        args = bird_card_dict['power_args']
         if args is None:
             args = {}
-        return BirdPowerFactory(bird_card['id']).create(**args)
+        return BirdPowerFactory(bird_card_dict['id']).create(**args)
 
-    def _to_state(self) -> Dict[str, int]:
-        return {
-            'id': self.id,
-            'eggs': self.eggs,
-        }
+    def _to_state(self) -> BirdState:
+        return BirdState(self.id, self.color, self.eggs, self.habitat)
+
+    def play(self, habitat: str):
+        self.played_habitat = habitat

@@ -1,6 +1,6 @@
 from actions import *
 from bird_card import BirdCard
-from state import *
+from state import BoardState, HabitatState
 
 from typing import List, Optional
 
@@ -28,6 +28,7 @@ class FullRowSpace(Space):
 
 class Habitat:
     def __init__(self, base_action: Action, space_action_n: List[int]):
+        self.name = {GainFoodAction: 'forest', LayEggsAction: 'grassland', DrawCardsAction: 'wetland'}[self.base_action]
         self.base_action = base_action
         self.base_item = {GainFoodAction: 'food', LayEggsAction: 'egg', DrawCardsAction: 'card'}[self.base_action]
         self.space_action_n = space_action_n
@@ -61,8 +62,9 @@ class Habitat:
 
         return spaces
 
-    def _to_state(self) -> Dict[int, Dict[str, int]]:
-        return {space.bird.id: space.bird.state for space in self.spaces[:self.curr_open_idx]}
+    def _to_state(self) -> HabitatState:
+        bird_states = [space.bird.state for space in self.spaces[:self.curr_open_idx]]
+        return HabitatState(self)
 
     def execute(self):
         pass
