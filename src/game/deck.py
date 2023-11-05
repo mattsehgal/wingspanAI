@@ -16,9 +16,7 @@ class Deck:
     def _init_deck() -> List[BirdCard]:
         # df = pd.read_csv('/kaggle/input/wingspan-base-game-birds-cleaned/BaseGameBirds.csv')
         df = parse_csv()
-        for idx, row in df.iterrows():
-            print(row)
-        deck = [BirdCard(row) for index, row in df.iterrows()]
+        deck = [BirdCard(row.to_dict()) for index, row in df.iterrows()]
         random.shuffle(deck)
         return deck
 
@@ -47,12 +45,6 @@ class Deck:
                 self.tray.append(new_card)
             else:
                 break  # Stop refilling if the deck is empty
-
-    def __str__(self) -> str:
-        string = "Deck:\n"
-        for card in self.deck:
-            string += card.__string__() + "\n"
-        return string
 
 
 if __name__ == '__main__':

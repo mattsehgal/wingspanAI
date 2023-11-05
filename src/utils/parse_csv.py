@@ -16,23 +16,26 @@ def get_unique_power_categories(df: pd.DataFrame) -> List[str]:
 
 
 def parse_first_word_dict(df: pd.DataFrame) -> Dict[str, List[str]]:
+    id_list = df['id'].tolist()
     power_list = df['power_text'].tolist()
     res_dict = dict()
 
-    for text in power_list:
-        if not isinstance(text, str):
+    for bird_id, power_text in zip(id_list, power_list):
+        if not isinstance(power_text, str):
+            res_entry = (bird_id, '')
             if 'none' in res_dict:
-                res_dict['none'].append('')
+                res_dict['none'].append(res_entry)
             else:
-                res_dict['none'] = ['']
+                res_dict['none'] = [res_entry]
             continue
 
-        text = text.lower()
-        first_word = text.split(' ')[0]
+        power_text = power_text.lower()
+        first_word = power_text.split(' ')[0]
+        res_entry = (bird_id, power_text)
         if first_word in res_dict:
-            res_dict[first_word].append(text)
+            res_dict[first_word].append(res_entry)
         else:
-            res_dict[first_word] = [text]
+            res_dict[first_word] = [res_entry]
 
     return res_dict
 
@@ -147,7 +150,6 @@ def get_power_regex(power: str) -> str:
                  'entailment', 'action', 'item', 'location', 'end_group',
                  'end_group',
                  'assertion'],
-
     }
     power = power.lower()
     components = power_components[power]
@@ -178,20 +180,26 @@ def regex_group_dict(text: str, regex: str) -> Optional[Dict[str, AnyStr]]:
     return match_dict
 
 
-def parse_bird_powers():
+def parse_bird_powers() -> Dict[int, Optional[Dict[str, AnyStr]]]:
+    bird_power_args = {}
     fw_map = parse_first_word_dict(bird_df)
-    print(sum([len(sublist) for _, sublist in fw_map.items()]))
-    # df['parsed_power_text'] =
-    re_list = [regex_group_dict(text, get_power_regex(power))
-               if power != 'none' else {}
-               for power in fw_map.keys()
-               for text in fw_map[power]]
-    return re_list
+
+    for power, id_text_list in fw_map.items():
+        for bird_id, power_text in id_text_list:
+            if power != 'none':
+                power_regex = get_power_regex(power)
+                args = regex_group_dict(power_text, power_regex)
+                bird_power_args[bird_id] = args
+            else:
+                bird_power_args[bird_id] = {}
+
+    return bird_power_args
 
 
 def parse_csv() -> pd.DataFrame:
-    bird_df['power_args'] = parse_bird_powers()
+    bird_df['power_args'] = bird_df['id'].map(parse_bird_powers())
     bird_df['color'] = bird_df['color'].fillna('None')
+    bird_df['nest_type'] = bird_df['nest_type'].fillna('None')
     bird_df['power_text'] = bird_df['power_text'].fillna('')
     return bird_df
 
