@@ -1,9 +1,6 @@
 import random
 
-from player import Player
-from game import Game
-
-from typing import List
+from typing import Dict, List
 
 
 class FoodDie:
@@ -16,6 +13,9 @@ class FoodDie:
         face = random.choice(self.faces)
         self.current_face = face
         return face
+
+    def __eq__(self) -> str:
+        return self.current_face
 
 
 class BirdFeeder:
@@ -34,10 +34,21 @@ class BirdFeeder:
         for die in dice:
             die.roll()
 
-    def gain(self, tokens):
-        # gain based on face, choose from double face first when applicable
-        # move from dice_in to dice_out
+    def _gain_food_from_die(self, ):
         pass
+
+    def _token_in_feeder(self, token: str) -> bool:
+        pass
+
+    def gain_food(self, tokens: Dict[str, int]) -> bool:
+        # TODO handle reroll
+        for token, n in tokens.items():
+            for _ in range(n):
+                if token in self.dice_in:
+                    die = self.dice_in.remove(token)
+                    self.dice_out.append(die)
+                else:
+                    return False
 
     def reroll(self):
         self.dice_in.extend(self.dice_out)
@@ -46,3 +57,8 @@ class BirdFeeder:
 
     def roll_not_in(self):
         self._reroll_dice(self.dice_out)
+
+
+if __name__ == '__main__':
+    bf = BirdFeeder()
+    print(bf)

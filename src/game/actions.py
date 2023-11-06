@@ -1,6 +1,4 @@
-from state import *
-
-from typing import AnyStr, Dict, List
+from typing import AnyStr, Dict, List, Union
 
 
 # Base Player Actions
@@ -8,38 +6,39 @@ class Action:
     def __init__(self, args: Dict[str, str] = {}):
         self.args = args
 
-    def execute(self, game: Game) -> bool:
+    def execute(self, game_state) -> bool:
         return False
 
 
 class PlayBirdAction(Action):
     def __init__(self):
         self.type = 'play_bird'
+        try:
+            # TODO verify loc1 arg
+            self.habitat = self.args['location1']
+        except KeyError:
+            self.habitat = None
 
-    def execute(self, game: Game) -> bool:
-        player = game.current_player
-        choice = game.get_player_input(self.type)
-        bird_id = choice['bird_id']
-        player.play_bird(bird_id)
+    def execute(self, choice: Dict[str, Union[int, str]], game_state) -> bool:
+        habitat = self.habitat if self.habitat else choice['habitat']
+        game_state.play_bird(choice['bird_id'], habitat)
 
 
 class GainFoodAction(Action):
     def __init__(self):
         self.type = 'gain_food'
 
-    def execute(self, game):
-        player = game.current_player
-        choice = game.get_player_input(self.type, args=self.args)
-        player.board.gain_food(choice)
+    def execute(self, choice: Dict[str, Union[int, str]], game_state):
+        game_state.gain_food(choice['food_tokens'], self.args['location'])
 
 
 class LayEggsAction(Action):
     def __init__(self):
         self.type = 'lay_eggs'
 
-    def execute(self, game):
-        player = game.current_player
-        choice = game.get_player_input(self.type, args=self.args)
+    def execute(self, game_state):
+        player = game_state.current_player
+        choice = game_state.get_player_input(self.type, args=self.args)
         player.board.lay_eggs(choice)
 
 
@@ -47,9 +46,9 @@ class DrawCardsAction(Action):
     def __init__(self):
         self.type = 'draw_cards'
 
-    def execute(self, game):
-        player = game.current_player
-        choice = game.get_player_input(self.type, args=self.args)
+    def execute(self, game_state):
+        player = game_state.current_player
+        choice = game_state.get_player_input(self.type, args=self.args)
         player.draw_bird_cards(choice)
 
 
@@ -58,21 +57,21 @@ class CacheFoodAction(Action):
     def __init__(self):
         self.type = 'cache_food'
 
-    def execute(self, game):
-        player = game.current_player
-        choice = game.get_player_input(self.type, args=self.args)
-        player.board.current_space.bird.cache(args)
+    def execute(self, game_state):
+        player = game_state.current_player
+        choice = game_state.get_player_input(self.type, args=self.args)
+        player.board.current_space.bird.cache(self.args)
 
 
 class ComplexAction(Action):
-    def execute(self, game):
+    def execute(self, game_state):
         pass
 
 
 class DiscardAction(Action):
-    def execute(self, game):
-        player = game.current_player
-        args = game.get_player_input(type='discard')
+    def execute(self, game_state):
+        player = game_state.current_player
+        args = game_state.get_player_input(type='discard')
         player.board.discard(args)
 
 
@@ -81,38 +80,38 @@ class DrawBonusAction(Action):
         self.draw_n = draw_n
         self.discard_n = discard_n
 
-    def execute(self, game):
-        player = game.current_player
-        game.bonus_deck.draw(self.draw_n)
+    def execute(self, game_state):
+        player = game_state.current_player
+        game_state.bonus_deck.draw(self.draw_n)
         player.discard(item='bonus', n=self.discard_n)
 
 
 class ExchangeAction(Action):
-    def execute(self, game):
-        player = game.current_player
-        args = game.get_player_input(type='exchange')
-        game.exchange(args)
+    def execute(self, game_state):
+        player = game_state.current_player
+        args = game_state.get_player_input(type='exchange')
+        game_state.exchange(args)
 
 
 class FlockingAction(Action):
-    def execute(self, game):
-        player = game.current_player
-        args = game.get_player_input(type='flocking')
+    def execute(self, game_state):
+        player = game_state.current_player
+        args = game_state.get_player_input(type='flocking')
         player.board.current_space.bird.tuck(args)  # or something
 
 
 class GiveToPlayerAction(Action):
-    def execute(self, game):
+    def execute(self, game_state):
         pass
 
 
 class HuntingAction(Action):
-    def execute(self, game):
+    def execute(self, game_state):
         pass
 
 
 class RepeatPowerAction(Action):
-    def execute(self, game):
+    def execute(self, game_state):
         pass
 
 
@@ -120,9 +119,9 @@ class ActionSequence:
     def __init__(self, actions: List[Action]):
         self.actions = actions
 
-    def execute(self, game):
+    def execute(self, game_state):
         for action in self.actions:
-            action.execute(game)
+            action.execute(game_state)
 
 
 # class ActionFactory:
