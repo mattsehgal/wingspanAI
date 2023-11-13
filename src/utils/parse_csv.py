@@ -3,6 +3,8 @@ import os
 import pandas as pd
 import re
 
+from src.utils.post_processing import *
+
 from typing import AnyStr, Dict, List, Optional
 
 load_dotenv()
@@ -178,19 +180,40 @@ def regex_group_dict(text: str, regex: str) -> Optional[Dict[str, AnyStr]]:
     return match_dict
 
 
-def parse_bird_powers():
+def parse_bird_powers() -> List[Dict[str, str]]:
     fw_map = parse_first_word_dict(bird_df)
-    print(sum([len(sublist) for _, sublist in fw_map.items()]))
-    # df['parsed_power_text'] =
-    re_list = [regex_group_dict(text, get_power_regex(power))
-               if power != 'none' else {}
-               for power in fw_map.keys()
-               for text in fw_map[power]]
-    return re_list
+    args_list = [regex_group_dict(text, get_power_regex(power))
+                 if power != 'none' else {}
+                 for power in fw_map.keys()
+                 for text in fw_map[power]]
+    return args_list
+
+
+def post_process(arg_dicts: List[Dict[str, str]]):
+    for args in arg_dicts:
+        for k, v in args.items():
+            if 'condition' in k:
+                pass
+            elif 'entailment' in k:
+                pass
+            elif 'if_ws' in k:
+                pass
+            elif 'if' in k:
+                pass
+            elif 'item' in k:
+                args[k] = parse_item(v)
+            elif 'location' in k:
+                args[k] = parse_location(v)
+            elif 'when_cond' in k:
+                pass
+            else:
+                continue
 
 
 def parse_csv() -> pd.DataFrame:
-    bird_df['power_args'] = parse_bird_powers()
+    bird_power_args = parse_bird_powers()
+    post_process(bird_power_args)
+    bird_df['power_args'] = bird_power_args
     bird_df['color'] = bird_df['color'].fillna('None')
     bird_df['power_text'] = bird_df['power_text'].fillna('')
     return bird_df
@@ -208,8 +231,3 @@ if __name__ == '__main__':
     #     for text in fw[power]:
     #         print(text)
     #         print(regex_group_dict(text, regex))
-
-"""NOTES
-
-all/each/... need to be folded into players component
-"""

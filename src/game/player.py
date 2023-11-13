@@ -14,7 +14,7 @@ class Player:
         self.bird_cards: List[BirdCard] = []
         self.bonus_cards: List[BonusCard] = []
 
-        self.board = Board()
+        self.board = Board(self.id)
         self.food_tokens = {'slug': 0,
                             'wheat': 0,
                             'berry': 0,

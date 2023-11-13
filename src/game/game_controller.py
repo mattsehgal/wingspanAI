@@ -1,5 +1,5 @@
 from actions import Action
-from state import GameState
+from game_state import GameState
 
 
 class GameController:
@@ -8,10 +8,4 @@ class GameController:
 
     def execute_action(self, action: Action):
         action.execute(self.game_state)
-
-    def get_next_action(self):
-        pass
-
-    def update_game_state(self):
-        pass
 

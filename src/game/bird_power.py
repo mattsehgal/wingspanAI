@@ -94,7 +94,7 @@ class BirdPowerFactory:
         location1 = kwargs.get('location1', None)
 
     def _build_gain_food(self, **kwargs) -> GainFoodPower:
-        item1 = kwargs.get('n1', None)
+        item1 = kwargs.get('item1', None)
         n1 = kwargs.get('n1', None)
         location1 = kwargs.get('location1', None)
         entailment1 = kwargs.get('entailment1', None)

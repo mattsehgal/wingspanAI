@@ -7,35 +7,46 @@ from typing import List
 class Space:
     def __init__(self, actions: ActionSequence):
         self.actions = actions
-
         self.bird: BirdCard = None
 
-    def execute(self):
-        pass
+    def execute(self, game_state):
+        if self.bird:
+            self.bird.execute(game_state)
+        else:
+            self.actions.execute(game_state)
 
 
 class FullRowSpace(Space):
-    def execute(self):
-        pass
+    def __init__(self, actions: ActionSequence):
+        super().__init__(actions)
+
+    def execute(self, game_state):
+        self.actions.execute(game_state)
 
 
 class Habitat:
-    def __init__(self, space_action_n: List[int]):
-        self.spaces = self._init_spaces()
+    def __init__(self, base_action: Action, space_action_n: List[int]):
+        self.base_action = base_action
+        self.spaces = self._init_spaces(space_action_n)
         self.birds: Dict[int, BirdCard] = {}
         self.curr_open_space = self.spaces[0]
 
-    def _init_spaces(self) -> List[Space]:
+    def _init_spaces(self, action_n: List[int]) -> List[Space]:
         spaces = []
 
-        for idx in range(5):
-            actions = self._init_space_actions(idx)
-            space = Space(actions)
+        for i, n in enumerate(action_n):
+            args = {'n': n}
+            actions = [self.base_action(args)]
+            # If odd (exchange spaces)
+            if i % 2 != 0:
+                exch_args = {}
+                actions.append(ExchangeAction(exch_args))
+            # If last space (no bird)
+            if i+1 == len(action_n):
+                space = FullRowSpace(actions)
+            else:
+                space = Space(ActionSequence(actions))
             spaces.append(space)
-
-        actions = self._init_space_actions(5)
-        space = FullRowSpace(actions)
-        spaces.append(space)
 
         return spaces
 
@@ -44,10 +55,10 @@ class Habitat:
             curr_idx = self.spaces.index(self.curr_open_space)
             self.curr_open_space = self.spaces[curr_idx+1]
 
-    def execute(self):
+    def execute(self, game_state):
         curr_idx = self.spaces.index(self.curr_open_space)
         for space in self.spaces[:curr_idx]:
-            space.execute()
+            space.execute(game_state)
 
     def play_bird(self, bird: BirdCard):
         if not isinstance(self.curr_open_space, FullRowSpace):

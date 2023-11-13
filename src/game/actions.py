@@ -3,7 +3,7 @@ from typing import AnyStr, Dict, List, Union
 
 # Base Player Actions
 class Action:
-    def __init__(self, args: Dict[str, str] = {}):
+    def __init__(self, args: Dict[str, AnyStr] = {}):
         self.args = args
 
     def execute(self, game_state) -> bool:
@@ -11,8 +11,9 @@ class Action:
 
 
 class PlayBirdAction(Action):
-    def __init__(self):
-        self.type = 'play_bird'
+    def __init__(self, args):
+        super().__init__(args)
+        self.name = 'play_bird'
         try:
             # TODO verify loc1 arg
             self.habitat = self.args['location1']
@@ -25,41 +26,44 @@ class PlayBirdAction(Action):
 
 
 class GainFoodAction(Action):
-    def __init__(self):
-        self.type = 'gain_food'
+    def __init__(self, args):
+        super().__init__(args)
+        self.name = 'gain_food'
 
     def execute(self, choice: Dict[str, Union[int, str]], game_state):
         game_state.gain_food(choice['food_tokens'], self.args['location'])
 
 
 class LayEggsAction(Action):
-    def __init__(self):
-        self.type = 'lay_eggs'
+    def __init__(self, args):
+        super().__init__(args)
+        self.name = 'lay_eggs'
 
     def execute(self, game_state):
         player = game_state.current_player
-        choice = game_state.get_player_input(self.type, args=self.args)
+        choice = game_state.get_player_input(self.name, args=self.args)
         player.board.lay_eggs(choice)
 
 
 class DrawCardsAction(Action):
-    def __init__(self):
-        self.type = 'draw_cards'
+    def __init__(self, args):
+        self.name = 'draw_cards'
+        super().__init__(args)
 
     def execute(self, game_state):
         player = game_state.current_player
-        choice = game_state.get_player_input(self.type, args=self.args)
+        choice = game_state.get_player_input(self.name, args=self.args)
         player.draw_bird_cards(choice)
 
 
 # Other Actions
 class CacheFoodAction(Action):
     def __init__(self):
-        self.type = 'cache_food'
+        self.name = 'cache_food'
 
     def execute(self, game_state):
         player = game_state.current_player
-        choice = game_state.get_player_input(self.type, args=self.args)
+        choice = game_state.get_player_input(self.name, args=self.args)
         player.board.current_space.bird.cache(self.args)
 
 
@@ -122,11 +126,3 @@ class ActionSequence:
     def execute(self, game_state):
         for action in self.actions:
             action.execute(game_state)
-
-
-# class ActionFactory:
-#     def __init__(self):
-#         pass
-#
-#     def create(self, action: str, args: Dict[str, AnyStr]) -> Action:
-#         pass

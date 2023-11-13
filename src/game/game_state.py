@@ -12,7 +12,7 @@ from typing import Dict, List
 class GameState:
     def __init__(self, player_names: List[str]):
         # Players
-        self.players: List[Player] = [Player(name) for name in player_names]
+        self.players: List[Player] = [Player(_id, name) for _id, name in enumerate(player_names)]
         self.player_boards: Dict[int, Board] = {player.id: player.board for player in self.players}
         random.shuffle(self.players)  # Set player order
         self.current_player = self.players[0]
