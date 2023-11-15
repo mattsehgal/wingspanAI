@@ -20,6 +20,7 @@ def parse_item(item: str) -> str:
 
     return item
 
+
 # TODO fix name/value issue
 def parse_location(location: str) -> str:
     # GAIN FOOD LOCATIONS
