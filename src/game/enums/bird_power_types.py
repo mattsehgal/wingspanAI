@@ -1,17 +1,14 @@
 from enum import Enum, auto
 
-from typing import List
+from typing import Any, List
 
 
-class StringEnum(Enum):
+class AutoName(Enum):
     def _generate_next_value_(name, start, count, last_values):
         return name
 
-    def __str__(self):
-        return self.name
 
-
-class ComponentType(StringEnum):
+class ComponentType(AutoName):
     ACTION = auto()
     ASSERTION = auto()
     CONDITION = auto()
@@ -32,8 +29,25 @@ class ComponentType(StringEnum):
     WHEN = auto()
     WHEN_COND = auto()
 
+    @classmethod
+    def _compound(cls, name: str) -> List["ComponentType"]:
+        if name == '*ANIL':
+            return [cls.ACTION, cls.N, cls.ITEM, cls.LOCATION]
+        else:
+            return []
 
-class ComponentRegex(Enum):
+    @classmethod
+    def list_from_names(cls, names: List[str]) -> List["ComponentType"]:
+        ctypes = []
+        for name in names:
+            if '*' in name:
+                ctypes.extend(cls._compound(name))
+            else:
+                ctypes.append(cls.__members__[name])
+        return ctypes
+
+
+class ComponentRegex(AutoName):
     ACTION = r'(?P<ACTION>PLAY|GAINS?|LAYS?|DRAW|CACHE|DISCARD|KEEP|LOOK AT|MOVE|REPEAT|ROLL|TRADE|TUCK)'
     ASSERTION = r'\.$'
     CONDITION = r'(?P<CONDITION>ARE .+?,?|AT .+?|IF THEY .+?|PAY .+?|STARTING .+?|WITH (THE )?.+?:?)'
@@ -89,7 +103,7 @@ class ComponentMapper:
         return cls._INVERSE.get(component_regex, None)
 
 
-class PowerType(StringEnum):
+class PowerType(AutoName):
     ALL = auto()
     DISCARD = auto()
     DRAW = auto()
@@ -109,86 +123,105 @@ class PowerType(StringEnum):
 
 class PowerMapper:
     _MAPPING = {
-        PowerType.ALL: [
-            ComponentType.PLAYERS, ComponentType.ACTION, ComponentType.N, ComponentType.ITEM,
-            ComponentType.LOCATION, ComponentType.GROUP, ComponentType.ENTAILMENT, ComponentType.ACTION,
-            ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION, ComponentType.END_GROUP,
-            ComponentType.OPTIONAL, ComponentType.ASSERTION
-        ],
-        PowerType.DISCARD: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.OPTIONAL, ComponentType.ENTAILMENT, ComponentType.ACTION, ComponentType.N,
-            ComponentType.ITEM, ComponentType.LOCATION, ComponentType.OPTIONAL, ComponentType.ASSERTION
-        ],
-        PowerType.DRAW: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.OPTIONAL, ComponentType.GROUP, ComponentType.ENTAILMENT, ComponentType.ACTION,
-            ComponentType.N, ComponentType.GROUP, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.CONDITION, ComponentType.END_GROUP, ComponentType.OPTIONAL, ComponentType.END_GROUP,
-            ComponentType.OPTIONAL, ComponentType.ASSERTION
-        ],
-        PowerType.EACH: [
-            ComponentType.PLAYERS, ComponentType.ACTION, ComponentType.N, ComponentType.ITEM,
-            ComponentType.LOCATION, ComponentType.CONDITION, ComponentType.ASSERTION
-        ],
-        PowerType.GAIN: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.GROUP, ComponentType.ENTAILMENT, ComponentType.ACTION, ComponentType.N,
-            ComponentType.ITEM, ComponentType.LOCATION, ComponentType.END_GROUP, ComponentType.OPTIONAL,
-            ComponentType.ASSERTION
-        ],
-        PowerType.IF: [
-            ComponentType.IF, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.ACTION, ComponentType.ITEM, ComponentType.LOCATION, ComponentType.ASSERTION
-        ],
-        PowerType.LAY: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.ASSERTION
-        ],
-        PowerType.LOOK: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.IF_WS, ComponentType.ACTION, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.ELSE, ComponentType.ACTION, ComponentType.ITEM, ComponentType.ASSERTION
-        ],
-        PowerType.PLAY: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.CONDITION, ComponentType.ASSERTION
-        ],
-        PowerType.PLAYERS: [
-            ComponentType.PLAYERS, ComponentType.CONDITION, ComponentType.ACTION, ComponentType.N,
-            ComponentType.ITEM, ComponentType.LOCATION, ComponentType.OPTIONAL, ComponentType.ASSERTION
-        ],
-        PowerType.REPEAT: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.POWER, ComponentType.LOCATION,
-            ComponentType.ASSERTION
-        ],
-        PowerType.ROLL: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.IF, ComponentType.N, ComponentType.CONDITION, ComponentType.ACTION,
-            ComponentType.N, ComponentType.ITEM, ComponentType.ENTAILMENT, ComponentType.ACTION,
-            ComponentType.ITEM, ComponentType.LOCATION, ComponentType.ASSERTION
-        ],
-        PowerType.TRADE: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.N,
-            ComponentType.ITEM, ComponentType.LOCATION, ComponentType.ASSERTION
-        ],
-        PowerType.TUCK: [
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.ENTAILMENT, ComponentType.ACTION, ComponentType.N, ComponentType.ITEM,
-            ComponentType.LOCATION, ComponentType.OPTIONAL, ComponentType.ASSERTION
-        ],
-        # TODO simplify somehow...
-        PowerType.WHEN: [
-            ComponentType.WHEN, ComponentType.PLAYERS, ComponentType.WHEN_COND,
-            ComponentType.GROUP, ComponentType.GROUP, ComponentType.N, ComponentType.ITEM,
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.END_GROUP, ComponentType.OR, ComponentType.GROUP, ComponentType.ACTION,
-            ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION, ComponentType.END_GROUP,
-            ComponentType.OR, ComponentType.GROUP, ComponentType.CONDITION, ComponentType.ENTAILMENT,
-            ComponentType.ACTION, ComponentType.N, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.ENTAILMENT, ComponentType.ACTION, ComponentType.ITEM, ComponentType.LOCATION,
-            ComponentType.END_GROUP, ComponentType.END_GROUP, ComponentType.ASSERTION
-        ],
+        PowerType.ALL: ComponentType.list_from_names(
+                [
+                    'PLAYERS', '*ANIL',
+                    'GROUP', 'ENTAILMENT', '*ANIL', 'END_GROUP',
+                    'OPTIONAL', 'ASSERTION'
+                ]
+        ),
+        PowerType.DISCARD: ComponentType.list_from_names(
+            [
+                '*ANIL', 'OPTIONAL', 'ENTAILMENT',
+                '*ANIL', 'OPTIONAL', 'ASSERTION'
+            ]
+        ),
+        PowerType.DRAW: ComponentType.list_from_names(
+            [
+                '*ANIL', 'OPTIONAL',
+                'GROUP', 'ENTAILMENT', 'ACTION', 'N',
+                'GROUP', 'ITEM', 'LOCATION', 'CONDITION',
+                'END_GROUP', 'OPTIONAL',
+                'END_GROUP', 'OPTIONAL', 'ASSERTION'
+            ]
+        ),
+        PowerType.EACH: ComponentType.list_from_names(
+            [
+                'PLAYERS', '*ANIL', 'CONDITION', 'ASSERTION'
+            ]
+        ),
+        PowerType.GAIN: ComponentType.list_from_names(
+            [
+                '*ANIL',
+                'GROUP', 'ENTAILMENT', '*ANIL', 'END_GROUP',
+                'OPTIONAL', 'ASSERTION'
+            ]
+        ),
+        PowerType.IF: ComponentType.list_from_names(
+            [
+                'IF', 'N', 'ITEM', 'LOCATION',
+                'ACTION', 'ITEM', 'LOCATION', 'ASSERTION'
+            ]
+        ),
+        PowerType.LAY: ComponentType.list_from_names(
+            [
+                '*ANIL', 'ASSERTION'
+            ]
+        ),
+        PowerType.LOOK: ComponentType.list_from_names(
+            [
+                '*ANIL',
+                'IF_WS', 'ACTION', 'ITEM', 'LOCATION',
+                'ELSE', 'ACTION', 'ITEM', 'ASSERTION'
+            ]
+        ),
+        PowerType.PLAY: ComponentType.list_from_names(
+            [
+                '*ANIL', 'CONDITION', 'ASSERTION'
+            ]
+        ),
+        PowerType.PLAYERS: ComponentType.list_from_names(
+            [
+                'PLAYERS', 'CONDITION', '*ANIL', 'OPTIONAL', 'ASSERTION'
+            ]
+        ),
+        PowerType.REPEAT: ComponentType.list_from_names(
+            [
+                'ACTION', 'N', 'POWER', 'LOCATION', 'ASSERTION'
+            ]
+        ),
+        PowerType.ROLL: ComponentType.list_from_names(
+            [
+                '*ANIL',
+                'IF', 'N', 'CONDITION', 'ACTION', 'N', 'ITEM',
+                'ENTAILMENT', 'ACTION', 'ITEM', 'LOCATION', 'ASSERTION'
+            ]
+        ),
+        PowerType.TRADE: ComponentType.list_from_names(
+            [
+                'ACTION', 'N', 'ITEM', 'N', 'ITEM', 'LOCATION', 'ASSERTION'
+            ]
+        ),
+        PowerType.TUCK: ComponentType.list_from_names(
+            [
+                '*ANIL', 'ENTAILMENT', '*ANIL', 'OPTIONAL', 'ASSERTION'
+            ]
+        ),
+
+        # TODO simplify?
+        PowerType.WHEN: ComponentType.list_from_names(
+            [
+                'WHEN', 'PLAYERS', 'WHEN_COND',
+                'GROUP',
+                'GROUP', 'N', 'ITEM', '*ANIL',
+                'END_GROUP', 'OR',
+                'GROUP', '*ANIL',
+                'END_GROUP', 'OR',
+                'GROUP', 'CONDITION', 'ENTAILMENT', '*ANIL',
+                'ENTAILMENT', 'ACTION', 'ITEM', 'LOCATION',
+                'END_GROUP', 'END_GROUP', 'ASSERTION'
+            ]
+        ),
     }
 
     @classmethod

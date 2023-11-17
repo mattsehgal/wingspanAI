@@ -13,8 +13,8 @@ load_dotenv()
 bird_csv_path = os.environ['BIRD_CSV']
 bird_df = pd.read_csv(bird_csv_path)
 
-INCREMENT_COMPONENTS = [ct.ACTION, ct.CONDITION, ct.ENTAILMENT, ct.IF,
-                        ct.IF_WS, ct.ITEM, ct.LOCATION, ct.N, ct.WHEN_COND]
+INCREMENT_COMPONENTS = ct.list_from_names(['ACTION', 'CONDITION', 'ENTAILMENT', 'IF',
+                                           'IF_WS', 'ITEM', 'LOCATION', 'N', 'WHEN_COND'])
 
 
 def get_unique_power_categories(df: pd.DataFrame) -> List[str]:
@@ -35,7 +35,7 @@ def parse_first_word_dict(df: pd.DataFrame) -> Dict[str, List[str]]:
             continue
 
         text = text.upper()
-        first_word = remove_parens(text.split(' ')[0].upper())
+        first_word = strip_parens(text.split(' ')[0].upper())
         if first_word in res_dict:
             res_dict[first_word].append(text)
         else:
@@ -196,11 +196,15 @@ def parse_bird_powers() -> List[Dict[str, str]]:
 
 def post_process(arg_dicts: List[Dict[str, str]]):
     for args in arg_dicts:
+        if not args:
+            continue
+
         remove_keys = []
+
         for k, v in args.items():
             if not v or v == ' ':
                 remove_keys.append(k)
-            elif ct.ACTION.value in k or ct.N.value in k:
+            elif ct.ACTION.value in k:
                 continue
             elif ct.CONDITION.value in k:
                 pass
@@ -214,13 +218,24 @@ def post_process(arg_dicts: List[Dict[str, str]]):
                 args[k] = parse_item(v)
             elif ct.LOCATION.value in k:
                 args[k] = parse_location(v)
+            elif ct.N == k:
+                args[k] = parse_n(v)
             elif ct.WHEN_COND.value in k:
                 pass
             else:
                 continue
+
+        # Link args labelled PREVIOUS to previously indexed arg
+        for prev in {k: v for k, v in args.items() if v == 'PREVIOUS'}:
+            # String of decremented index of the arg with value PREVIOUS
+            idx = str(int(''.join(re.findall(r'\d+', prev))) - 1)
+            arg = ''.join(re.findall(r'\D+', prev))
+            args[prev] = arg+idx
+
         for k in remove_keys:
             args.pop(k)
-        print(args)
+
+    return arg_dicts
 
 
 def parse_csv() -> pd.DataFrame:

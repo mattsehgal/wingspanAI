@@ -32,7 +32,16 @@ def parse_location(location: str) -> str:
 
     # DRAW/DISCARD CARDS LOCATIONS
 
+    # HABITAT/NEST LOCATIONS
+    if {word for word in location.split(' ') if '[' in word}:
+        location = reduce_to_substring(location, strip_to_brackets(location))
+
     return location
+
+
+def parse_n(n: str) -> str:
+    # TODO handle getting /d out of any d/ etc, handle words = 1, handle "all"
+    return n
 
 
 # STRING OPS
@@ -40,9 +49,14 @@ def reduce_to_substring(string: str, substring: str):
     return substring if substring in string else string
 
 
-def remove_parens(string: str) -> str:
+def strip_brackets(string: str) -> str:
+    return string.replace('[', '').replace(']', '')
+
+
+def strip_parens(string: str) -> str:
     return string.replace('(', '').replace(')', '')
 
 
-def strip_brackets(string: str) -> str:
-    return string.removeprefix('[').removesuffix(']')
+def strip_to_brackets(string: str) -> str:
+    string = ''.join(string.split('[')[1].split(']')[0])
+    return string
