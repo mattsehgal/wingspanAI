@@ -1,9 +1,9 @@
-from typing import AnyStr, Dict, List, Union
+from typing import Dict, List, Union
 
 
 # Base Player Actions
 class Action:
-    def __init__(self, args: Dict[str, AnyStr] = {}):
+    def __init__(self, args: Dict[str, str] = {}):
         self.args = args
 
     def execute(self, game_state) -> bool:
@@ -58,7 +58,8 @@ class DrawCardsAction(Action):
 
 # Other Actions
 class CacheFoodAction(Action):
-    def __init__(self):
+    def __init__(self, args):
+        super().__init__(args)
         self.name = 'cache_food'
 
     def execute(self, game_state):
@@ -126,3 +127,15 @@ class ActionSequence:
     def execute(self, game_state):
         for action in self.actions:
             action.execute(game_state)
+
+
+class ActionFactory:
+    _MAPPER = {
+        'CACHE': CacheFoodAction,
+        'GAIN': GainFoodAction,
+    }
+
+    @classmethod
+    def create(cls, action: str, args: Dict[str, str]) -> Action:
+        return cls._MAPPER[action](args)
+

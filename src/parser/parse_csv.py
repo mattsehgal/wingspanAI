@@ -124,7 +124,7 @@ def post_process(arg_dicts: List[Dict[str, str]]):
                 args[k] = parse_item(v)
             elif ComponentType.LOCATION.value in k:
                 args[k] = parse_location(v)
-            elif ComponentType.N == k:
+            elif ComponentType.N.value in k:
                 args[k] = parse_n(v)
             elif ComponentType.WHEN_COND.value in k:
                 pass
@@ -141,6 +141,7 @@ def post_process(arg_dicts: List[Dict[str, str]]):
         for k in remove_keys:
             args.pop(k)
 
+    test = [ad for ad in arg_dicts if (ad and 'ACTION1' in ad and ad['ACTION1'] == 'TUCK')]
     return arg_dicts
 
 

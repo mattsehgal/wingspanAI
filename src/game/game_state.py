@@ -54,3 +54,8 @@ class GameState:
         player = self.current_player
         drawn_cards = self.bonus_deck.draw(n)
         player.add_bonus_cards(drawn_cards)
+
+
+if __name__ == '__main__':
+    s = GameState(['p1'])
+    print(s)

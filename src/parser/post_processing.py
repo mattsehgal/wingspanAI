@@ -36,6 +36,11 @@ def parse_location(location: str) -> str:
     elif Location.SUPPLY.value in location:
         location = reduce_to_substring(location, Location.SUPPLY.value)
     # CACHE FOOD/LAY EGGS LOCATIONS
+    elif Location.BIRD.value in location:
+        if Location.ANY_BIRD() in location:
+            location = reduce_to_substring(location, Location.ANY_BIRD())
+        elif Location.THIS_BIRD() in location:
+            location = reduce_to_substring(location, Location.THIS_BIRD())
     elif Location.THIS_CARD() in location:
         location = reduce_to_substring(location, Location.THIS_CARD())
     # DRAW/DISCARD CARDS LOCATIONS
@@ -44,7 +49,13 @@ def parse_location(location: str) -> str:
 
 
 def parse_n(n: str) -> str:
-    # TODO handle getting /d out of any d/ etc, handle words = 1, handle "all"
+    if N.ALL.value in n:
+        n = N.ANY.value
+    elif N.ANY.value in n:
+        n = N.ANY.value
+    elif N.A.value in n:
+        n = str(1)
+
     return n
 
 
