@@ -108,6 +108,7 @@ class PowerType(AutoName):
     IF = auto()
     LAY = auto()
     LOOK = auto()
+    NONE = auto()
     PLAY = auto()
     PLAYERS = auto()
     REPEAT = auto()
@@ -171,6 +172,7 @@ class PowerMapper:
                 'ELSE', 'ACTION', 'ITEM', 'ASSERTION'
             ]
         ),
+        PowerType.NONE: [],
         PowerType.PLAY: ComponentType.list_from_names(
             [
                 '*ANIL', 'CONDITION', 'ASSERTION'

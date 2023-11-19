@@ -1,5 +1,7 @@
 from src.parser.enums.power_arg_types import *
 
+from typing import List
+
 
 # BIRD POWER ARG PARSING
 def parse_entailment(entailment: str) -> str:
@@ -9,13 +11,18 @@ def parse_entailment(entailment: str) -> str:
     return entailment
 
 
-def parse_item(item: str) -> str:
-    if Item.IT.value in item:
+def parse_item(item: str) -> List[str]:
+    if Item.OR.value in item:
+        item = [strip_brackets(it) for it in item.split(' '+Item.OR.value+' ')]
+        return item
+    elif Item.is_food(item):
+        return strip_brackets(item)
+    elif Item.IT.value in item:
         item = Item.PREVIOUS.value
     else:
         item = strip_brackets(item)
 
-    return item
+    return [item]
 
 
 def parse_location(location: str) -> str:
@@ -29,7 +36,8 @@ def parse_location(location: str) -> str:
     elif Location.SUPPLY.value in location:
         location = reduce_to_substring(location, Location.SUPPLY.value)
     # CACHE FOOD/LAY EGGS LOCATIONS
-
+    elif Location.THIS_CARD() in location:
+        location = reduce_to_substring(location, Location.THIS_CARD())
     # DRAW/DISCARD CARDS LOCATIONS
 
     return location

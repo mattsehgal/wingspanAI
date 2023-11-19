@@ -28,11 +28,12 @@ def parse_first_word_dict(df: pd.DataFrame) -> Dict[str, List[str]]:
     res_dict = dict()
 
     for text in power_list:
-        if not isinstance(text, str):
-            if 'NONE' in res_dict:
-                res_dict['NONE'].append('')
+        if not isinstance(text, str) or not text:
+            NONE = 'NONE'
+            if NONE in res_dict:
+                res_dict[NONE].append(NONE)
             else:
-                res_dict['NONE'] = ['']
+                res_dict[NONE] = [NONE]
             continue
 
         text = text.upper()
@@ -61,8 +62,6 @@ def get_component_regex(components: List[str]) -> List[str]:
 
 
 def get_power_regex(power: str) -> str:
-    if power == '':
-        print('check')
     power_type = PowerType[power]
     components = PowerMapper.get_components(power_type)
     component_regex = get_component_regex(components)
@@ -95,7 +94,7 @@ def regex_group_dict(text: str, regex: str) -> Optional[Dict[str, AnyStr]]:
 def parse_bird_powers() -> List[Dict[str, str]]:
     fw_map = parse_first_word_dict(bird_df)
     args_list = [regex_group_dict(text, get_power_regex(power))
-                 if power != 'none' else {}
+                 if power != 'NONE' else {}
                  for power in fw_map.keys()
                  for text in fw_map[power]]
     return args_list
@@ -133,7 +132,7 @@ def post_process(arg_dicts: List[Dict[str, str]]):
                 continue
 
         # Link args labelled PREVIOUS to previously indexed arg
-        for prev in {k: v for k, v in args.items() if v == 'PREVIOUS'}:
+        for prev in {k: v for k, v in args.items() if (v and v[0] == Item.PREVIOUS.value)}:
             # String of decremented index of the arg with value PREVIOUS
             idx = str(int(''.join(re.findall(r'\d+', prev))) - 1)
             arg = ''.join(re.findall(r'\D+', prev))
