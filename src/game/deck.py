@@ -1,11 +1,8 @@
-import os
 import random
-
-import pandas as pd
 
 from bird_card import BirdCard
 from bonus_card import BonusCard
-from src.utils.parse_csv import parse_csv
+from src.parser.parse_csv import parse_csv
 
 from typing import List, Union
 

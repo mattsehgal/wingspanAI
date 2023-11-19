@@ -1,40 +1,36 @@
-from src.game.enums.args.bird_power_args import *
-
-# from typing import Any, Dict, List, Optional, Union
+from src.parser.enums.power_arg_types import *
 
 
 # BIRD POWER ARG PARSING
 def parse_entailment(entailment: str) -> str:
-    if Entailment.MAY.name in entailment:
-        entailment = reduce_to_substring(entailment, Entailment.MAY.name)
+    if Entailment.MAY.value in entailment:
+        entailment = reduce_to_substring(entailment, Entailment.MAY.value)
 
     return entailment
 
 
 def parse_item(item: str) -> str:
-    if Item.IT.name in item:
-        # ref backward on 'it', add resolve_backwards_refs method
-        item = Item.PREVIOUS.name
+    if Item.IT.value in item:
+        item = Item.PREVIOUS.value
     else:
         item = strip_brackets(item)
 
     return item
 
 
-# TODO fix name/value issue
 def parse_location(location: str) -> str:
+    # HABITAT/NEST LOCATIONS
+    habitat = Location.get_habitat(location)
+    if habitat:
+        location = habitat
     # GAIN FOOD LOCATIONS
-    if Location.BIRDFEEDER.name in location:
-        location = reduce_to_substring(location, Location.BIRDFEEDER.name)
-    elif Location.SUPPLY.name in location:
-        location = reduce_to_substring(location, Location.SUPPLY.name)
+    elif Location.BIRDFEEDER.value in location:
+        location = reduce_to_substring(location, Location.BIRDFEEDER.value)
+    elif Location.SUPPLY.value in location:
+        location = reduce_to_substring(location, Location.SUPPLY.value)
     # CACHE FOOD/LAY EGGS LOCATIONS
 
     # DRAW/DISCARD CARDS LOCATIONS
-
-    # HABITAT/NEST LOCATIONS
-    if {word for word in location.split(' ') if '[' in word}:
-        location = reduce_to_substring(location, strip_to_brackets(location))
 
     return location
 

@@ -1,11 +1,7 @@
-from enum import Enum, auto
+from src.parser.enums.base import AutoName
+from enum import auto
 
-from typing import Any, List
-
-
-class AutoName(Enum):
-    def _generate_next_value_(name, start, count, last_values):
-        return name
+from typing import List
 
 
 class ComponentType(AutoName):
@@ -124,11 +120,11 @@ class PowerType(AutoName):
 class PowerMapper:
     _MAPPING = {
         PowerType.ALL: ComponentType.list_from_names(
-                [
-                    'PLAYERS', '*ANIL',
-                    'GROUP', 'ENTAILMENT', '*ANIL', 'END_GROUP',
-                    'OPTIONAL', 'ASSERTION'
-                ]
+            [
+                'PLAYERS', '*ANIL',
+                'GROUP', 'ENTAILMENT', '*ANIL', 'END_GROUP',
+                'OPTIONAL', 'ASSERTION'
+            ]
         ),
         PowerType.DISCARD: ComponentType.list_from_names(
             [
