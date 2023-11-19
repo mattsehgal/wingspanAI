@@ -3,7 +3,8 @@ from typing import Dict, List, Union
 
 # Base Player Actions
 class Action:
-    def __init__(self, args: Dict[str, str] = {}):
+    def __init__(self, action_type: str, args: Dict[str, str] = {}):
+        self.type = action_type
         self.args = args
 
     def execute(self, game_state) -> bool:
@@ -65,7 +66,6 @@ class CacheFoodAction(Action):
     def execute(self, game_state):
         player = game_state.current_player
         choice = game_state.get_player_input(self.name, args=self.args)
-        player.board.current_space.bird.cache(self.args)
 
 
 class ComplexAction(Action):
@@ -77,7 +77,6 @@ class DiscardAction(Action):
     def execute(self, game_state):
         player = game_state.current_player
         args = game_state.get_player_input(type='discard')
-        player.board.discard(args)
 
 
 class DrawBonusAction(Action):
@@ -102,7 +101,6 @@ class FlockingAction(Action):
     def execute(self, game_state):
         player = game_state.current_player
         args = game_state.get_player_input(type='flocking')
-        player.board.current_space.bird.tuck(args)  # or something
 
 
 class GiveToPlayerAction(Action):

@@ -65,12 +65,6 @@ class BirdDeck(Deck):
             else:
                 break  # Stop refilling if the deck is empty
 
-    def __str__(self) -> str:
-        string = "Deck:\n"
-        for card in self.deck:
-            string += card.__string__() + "\n"
-        return string
-
 
 class BonusDeck(Deck):
     def __init__(self):

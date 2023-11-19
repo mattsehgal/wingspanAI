@@ -1,7 +1,7 @@
 from actions import *
 from bird_card import BirdCard
 
-from typing import List
+from typing import List, Optional
 
 
 class Space:
@@ -29,7 +29,20 @@ class Habitat:
         self.base_action = base_action
         self.spaces = self._init_spaces(space_action_n)
         self.birds: Dict[int, BirdCard] = {}
+
         self.curr_open_space = self.spaces[0]
+        self.state = self._to_state()
+
+    def _init_space_actions(self, idx: int) -> ActionSequence:
+        n = self.space_action_n[idx]
+
+        if n % 2 == 0:
+            return ActionSequence([self.base_action({})])
+        else:
+            return ActionSequence([
+                self.base_action,
+                ExchangeAction({'recv_item': self.base_item})
+            ])
 
     def _init_spaces(self, action_n: List[int]) -> List[Space]:
         spaces = []
@@ -85,5 +98,4 @@ class Board:
 
     def lay_eggs(self, bird_id: int, n: int):
         self.played_birds[bird_id].eggs += n
-
 

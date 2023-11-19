@@ -1,4 +1,5 @@
 from bird_power import BirdPower, BirdPowerFactory
+from state import BirdState
 
 from typing import Dict
 
@@ -18,6 +19,7 @@ class BirdCard:
         self.wingspan = bird_card['wingspan']
         self.color = bird_card['color']
         self.power = self._init_power(bird_card)
+        self.eggs = 0
         self.egg_capacity = bird_card['egg_capacity']
         self.nest_type = bird_card['nest_type']
 

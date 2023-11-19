@@ -4,15 +4,14 @@ from actions import *
 class BirdPower:
     def __init__(self, bird_id: int, actions: ActionSequence):
         self.bird_id = bird_id
-        self.actions = actions
 
-    def execute(self, game):
-        self.actions.execute(game)
+    def execute(self):
+        self.actions.execute()
 
 
 class GainFoodPower(BirdPower):
-    def execute(self, game):
-        self.actions.execute(game)
+    def execute(self):
+        self.actions.execute()
 
 
 class LayEggsPower(BirdPower):
@@ -40,17 +39,11 @@ class DrawCardsPower(BirdPower):
 
 
 class DrawBonusPower(BirdPower):
-    def __init__(self, bird, actions):
-        super(bird, actions)
-
-    def execute(self, game):
+    def execute(self):
         self.actions.execute()
 
 
 class CacheFoodPower(BirdPower):
-    def __init__(self, bird, actions):
-        super(bird, actions)
-
     def execute(self, game):
         pass
 
@@ -76,8 +69,11 @@ class PlayAnotherPower(BirdPower):
 
 
 class BirdPowerFactory:
-    def __init__(self):
-        pass
+    def __init__(self, bird_id: int):
+        self.bird_id = bird_id
+
+    def _build_none_power(self) -> BirdPower:
+        return BirdPower(self.bird_id, ActionSequence([]))
 
     def _to_action_args(self, **kwargs) -> List[Dict[str, str]]:
         action_args = []
@@ -110,7 +106,7 @@ class BirdPowerFactory:
         n2 = kwargs.get('N2', None)
         actions = ActionSequence([DrawBonusAction(draw_n=n1, discard_n=n2)])
 
-        return DrawBonusPower(actions)
+        return DrawBonusPower(self.bird_id, actions)
 
     def _build_draw_cards(self, **kwargs) -> DrawCardsPower:
         n1 = kwargs.get('N1', None)
@@ -185,3 +181,4 @@ class BirdPowerFactory:
         # DEFAULT
         else:
             return BirdPower(ActionSequence([]))
+
