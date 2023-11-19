@@ -1,11 +1,11 @@
 from bird_power import BirdPower, BirdPowerFactory
 from state import BirdState
 
-from typing import Dict, Optional, Union
+from typing import Dict
 
 
 class BirdCard:
-    def __init__(self, bird_card: Dict[str, Optional[Union[int, str]]]):
+    def __init__(self, bird_card: Dict[str, str]):
         self.id = bird_card['id']
         self.name = bird_card['common_name']
         self.habitat = {
@@ -22,10 +22,6 @@ class BirdCard:
         self.eggs = 0
         self.egg_capacity = bird_card['egg_capacity']
         self.nest_type = bird_card['nest_type']
-        self.state = self._to_state()
-
-        # testing only
-        self.power_text = bird_card['power_text']
 
     def _init_food_cost(self, bird_card) -> str:
         if bird_card['food_slash']:
@@ -45,15 +41,12 @@ class BirdCard:
                          )
         return food_cost[:-1]
 
-    @staticmethod
-    def _init_power(bird_card_dict: Dict[str, str]) -> BirdPower:
-        args = bird_card_dict['power_args']
-        if args is None:
-            args = {}
-        return BirdPowerFactory(bird_card_dict['id']).create(**args)
+    def _init_power(self, bird_card) -> BirdPower:
+        args = bird_card['power_args']
+        return BirdPowerFactory().create(**args)
 
-    def _to_state(self) -> BirdState:
-        return BirdState(self.id, self.color, self.eggs, self.habitat)
+    def execute(self, game_state):
+        self.power.execute(game_state)
 
-    def play(self, habitat: str):
-        self.played_habitat = habitat
+    def __eq__(self, other):
+        return self.id

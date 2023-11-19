@@ -1,6 +1,5 @@
 from actions import *
 from bird_card import BirdCard
-from state import BoardState, HabitatState
 
 from typing import List, Optional
 
@@ -10,30 +9,27 @@ class Space:
         self.actions = actions
         self.bird: BirdCard = None
 
-    def play_bird(self, bird: BirdCard):
-        self.bird = bird
-        self.actions = bird.power
-
-    def execute(self, state: State):
-        self.actions.execute(state)
+    def execute(self, game_state):
+        if self.bird:
+            self.bird.execute(game_state)
+        else:
+            self.actions.execute(game_state)
 
 
 class FullRowSpace(Space):
     def __init__(self, actions: ActionSequence):
-        super(actions)
+        super().__init__(actions)
 
-    def execute(self, state: State):
-        self.actions.execute(state)
+    def execute(self, game_state):
+        self.actions.execute(game_state)
 
 
 class Habitat:
     def __init__(self, base_action: Action, space_action_n: List[int]):
-        self.name = {GainFoodAction: 'forest', LayEggsAction: 'grassland', DrawCardsAction: 'wetland'}[self.base_action]
         self.base_action = base_action
-        self.base_item = {GainFoodAction: 'food', LayEggsAction: 'egg', DrawCardsAction: 'card'}[self.base_action]
-        self.space_action_n = space_action_n
-        self.spaces = self._init_spaces()
-        self.curr_open_idx = 0
+        self.spaces = self._init_spaces(space_action_n)
+        self.birds: Dict[int, BirdCard] = {}
+
         self.curr_open_space = self.spaces[0]
         self.state = self._to_state()
 
@@ -48,31 +44,40 @@ class Habitat:
                 ExchangeAction({'recv_item': self.base_item})
             ])
 
-    def _init_spaces(self) -> List[Space]:
+    def _init_spaces(self, action_n: List[int]) -> List[Space]:
         spaces = []
 
-        for idx in range(5):
-            actions = self._init_space_actions(idx)
-            space = Space(actions)
+        for i, n in enumerate(action_n):
+            args = {'n': n}
+            actions = [self.base_action(args)]
+            # If odd (exchange spaces)
+            if i % 2 != 0:
+                exch_args = {}
+                actions.append(ExchangeAction(exch_args))
+            # If last space (no bird)
+            if i+1 == len(action_n):
+                space = FullRowSpace(actions)
+            else:
+                space = Space(ActionSequence(actions))
             spaces.append(space)
-
-        actions = self._init_space_actions(5)
-        space = FullRowSpace(actions)
-        spaces.append(space)
 
         return spaces
 
-    def _to_state(self) -> HabitatState:
-        bird_states = [space.bird.state for space in self.spaces[:self.curr_open_idx]]
-        return HabitatState(self)
+    def _update_curr_open_space(self):
+        if self.curr_open_space.bird:
+            curr_idx = self.spaces.index(self.curr_open_space)
+            self.curr_open_space = self.spaces[curr_idx+1]
 
-    def execute(self):
-        pass
+    def execute(self, game_state):
+        curr_idx = self.spaces.index(self.curr_open_space)
+        for space in self.spaces[:curr_idx]:
+            space.execute(game_state)
 
     def play_bird(self, bird: BirdCard):
-        self.curr_open_space.play_bird(bird)
-        self.curr_open_idx += 1
-        self.curr_open_space = self.spaces[self.curr_open_idx]
+        if not isinstance(self.curr_open_space, FullRowSpace):
+            self.curr_open_space.bird = bird
+            self._update_curr_open_space()
+            self.birds[bird.id] = bird
 
 
 class Board:
@@ -84,7 +89,13 @@ class Board:
         self.wetland = Habitat(DrawCardsAction, [1, 1, 2, 2, 3, 3])
 
         self.habitats = {'forest': self.forest, 'grassland': self.grassland, 'wetland': self.wetland}
+        self.played_birds: Dict[int, BirdCard] = {}
 
     def play_bird(self, bird: BirdCard, habitat: str):
-        self.habitats[habitat].play_bird()
+        self.habitats[habitat].play_bird(bird)
+        bird.played_habitat = habitat
+        self.played_birds[bird.id] = bird
+
+    def lay_eggs(self, bird_id: int, n: int):
+        self.played_birds[bird_id].eggs += n
 

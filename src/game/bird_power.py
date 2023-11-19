@@ -3,8 +3,7 @@ from actions import *
 
 class BirdPower:
     def __init__(self, bird_id: int, actions: ActionSequence):
-        self.bird = bird_id
-        self.actions = actions
+        self.bird_id = bird_id
 
     def execute(self):
         self.actions.execute()
@@ -21,8 +20,22 @@ class LayEggsPower(BirdPower):
 
 
 class DrawCardsPower(BirdPower):
-    def execute(self):
-        self.actions.execute()
+    def __init__(self, bird_id, **kwargs):
+        super(bird_id)
+        self.actions = self._parse_kwargs_to_actions(**kwargs)
+
+    def _parse_kwargs_to_actions(self, **kwargs) -> ActionSequence:
+        n1 = kwargs.get('n1', None)
+        location1 = kwargs.get('location1', None)
+        entailment1 = kwargs.get('entailment1', None)
+
+        if entailment1:
+            pass
+
+        return ActionSequence([])
+
+    def execute(self, game):
+        pass
 
 
 class DrawBonusPower(BirdPower):
@@ -62,45 +75,110 @@ class BirdPowerFactory:
     def _build_none_power(self) -> BirdPower:
         return BirdPower(self.bird_id, ActionSequence([]))
 
+    def _to_action_args(self, **kwargs) -> List[Dict[str, str]]:
+        action_args = []
+        arg_list = []
+        for kwarg in kwargs:
+            if 'ACTION' in kwarg:
+                if arg_list:
+                    action_args.append(
+                        {k[:-1] if k[-1].isdigit() else k: v
+                         for k, v in kwargs.items()
+                         if k in arg_list}
+                    )
+                    arg_list.clear()
+                continue
+            arg_list.append(kwarg)
+        if arg_list:
+            action_args.append(
+                {k[:-1] if k[-1].isdigit() else k: v
+                 for k, v in kwargs.items()
+                 if k in arg_list}
+            )
+
+        return action_args
+
     def _build_cache_food(self, **kwargs) -> CacheFoodPower:
         pass
 
     def _build_draw_bonus(self, **kwargs) -> DrawBonusPower:
-        n1 = kwargs.get('n1', None)
-        n2 = kwargs.get('n2', None)
+        n1 = kwargs.get('N1', None)
+        n2 = kwargs.get('N2', None)
         actions = ActionSequence([DrawBonusAction(draw_n=n1, discard_n=n2)])
 
         return DrawBonusPower(self.bird_id, actions)
 
     def _build_draw_cards(self, **kwargs) -> DrawCardsPower:
-        n1 = kwargs.get('n1', None)
-        location1 = kwargs.get('location1', None)
+        n1 = kwargs.get('N1', None)
+        location1 = kwargs.get('LOCATION1', None)
+
+    def _build_gain_food(self, **kwargs) -> GainFoodPower:
+        action1 = kwargs.get('ACTION1', None)
+        item1 = kwargs.get('ITEM1', None)
+        n1 = kwargs.get('N1', None)
+        location1 = kwargs.get('LOCATION1', None)
+        entailment1 = kwargs.get('ENTAILMENT1', None)
+
+        args = self._to_action_args(**kwargs)
+        print(action1, args[0])
+        action_list = [ActionFactory.create(action1, args[0])]
+
+        if entailment1:
+            action2 = kwargs.get('ACTION2', None)
+            action_list.append(ActionFactory.create(action2, args[1]))
+
+        action_seq = ActionSequence(action_list)
+        return GainFoodPower(action_seq)
+    # TODO add entailment as an Action
+
+    def _build_flocking(self, **kwargs) -> FlockingPower:
+        actions = ActionSequence([])
+        return FlockingPower(actions)
 
     def create(self, **kwargs) -> BirdPower:
-        if self.bird_id == 226:
-            print('here')
-        if not kwargs:
-            return self._build_none_power()
-
-        action1 = kwargs.get('action1', None)
+        action1 = kwargs.get('ACTION1', None)
         # Actions: cache|discard|draw|gain|keep|lay|look at|move|play|repeat|roll|trade|tuck
-        if action1 == 'cache':
+        # CACHE
+        if action1 == 'CACHE':
             return self._build_cache_food(**kwargs)
-
-        elif action1 == 'draw':
-            item1 = kwargs.get('item1', None)
-            if 'bonus' in item1:
+        # DISCARD
+        elif action1 == 'DISCARD':
+            return self._build_discard_item(**kwargs)
+        # DRAW CARD
+        elif action1 == 'DRAW':
+            item1 = kwargs.get('ITEM1', None)
+            if 'BONUS' in item1:
                 return self._build_draw_bonus(**kwargs)
             else:
                 return self._build_draw_cards(**kwargs)
-
+        # FLOCKING
+        elif action1 == 'TUCK':
+            return self._build_flocking(**kwargs)
+        # GAIN FOOD
+        elif action1 == 'GAIN':
+            return self._build_gain_food(**kwargs)
+        # HUNTING
+        elif action1 == 'LOOK' or action1 == 'ROLL':
+            return self._build_hunting(**kwargs)
+        # KEEP
+        elif action1 == 'KEEP':
+            print('idk')
+        # LAY EGGS
+        elif action1 == 'LAY':
+            return self._build_lay_eggs(**kwargs)
+        # MIGRATE
+        elif action1 == 'MOVE':
+            return self._build_migrate(**kwargs)
+        # PLAY ADDITIONAL BIRD
+        elif action1 == 'PLAY':
+            return self._build_play_addtional_bird(**kwargs)
+        # REPEAT
+        elif action1 == 'REPEAT':
+            return self._build_repeat(**kwargs)
+        # TRADE
+        elif action1 == 'TRADE':
+            pass
+        # DEFAULT
         else:
-            return None
+            return BirdPower(ActionSequence([]))
 
-        # elif action1 == 'play':
-        #     return self._build_play_addtional_bird(**kwargs)
-
-
-
-
-# parse_csv:parse_bird_powers() -> ... -> BirdPower -> ActionFactory:create(action, args) -> Action
