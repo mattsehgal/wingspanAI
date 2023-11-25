@@ -44,6 +44,15 @@ def parse_location(location: str) -> str:
     elif Location.THIS_CARD() in location:
         location = reduce_to_substring(location, Location.THIS_CARD())
     # DRAW/DISCARD CARDS LOCATIONS
+    elif Location.DECK.value in location:
+        location = reduce_to_substring(location, Location.DECK.value)
+    elif Location.HAND.value in location:
+        location = reduce_to_substring(location, Location.HAND.value)
+    elif Location.TRAY.value in location:
+        location = reduce_to_substring(location, Location.TRAY.value)
+    else:
+        # TODO handle
+        print('Location parse error')
 
     return location
 

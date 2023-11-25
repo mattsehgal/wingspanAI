@@ -3,25 +3,21 @@ from typing import Dict, List, Union
 
 # Base Player Actions
 class Action:
-    def __init__(self, action_type: str, args: Dict[str, str] = {}):
-        self.type = action_type
+    def __init__(self, args: Dict[str, str] = {}):
         self.args = args
+        self.prompt = False
 
-    def execute(self, game_state) -> bool:
-        return False
+    def execute(self, game_state: "GameState") -> bool:
+        return True
 
 
 class PlayBirdAction(Action):
     def __init__(self, args):
         super().__init__(args)
-        self.name = 'play_bird'
-        try:
-            # TODO verify loc1 arg
-            self.habitat = self.args['location1']
-        except KeyError:
-            self.habitat = None
+        self.name = 'PLAY_BIRD'
+        self.habitat = self.args['LOCATION']
 
-    def execute(self, choice: Dict[str, Union[int, str]], game_state) -> bool:
+    def execute(self, choice, game_state: "GameState") -> bool:
         habitat = self.habitat if self.habitat else choice['habitat']
         game_state.play_bird(choice['bird_id'], habitat)
 
@@ -29,21 +25,25 @@ class PlayBirdAction(Action):
 class GainFoodAction(Action):
     def __init__(self, args):
         super().__init__(args)
-        self.name = 'gain_food'
+        self.name = 'GAIN_FOOD'
+        self.n = self.args['N']
+        self.item = self.args['ITEM']
+        self.location = self.args['LOCATION']
 
-    def execute(self, choice: Dict[str, Union[int, str]], game_state):
-        game_state.gain_food(choice['food_tokens'], self.args['location'])
+    def execute(self, game_state: "GameState", choice: Dict[str, str]) -> bool:
+        food_tokens = choice['food_tokens']
+        game_state.gain_food(food_tokens, self.location)
 
 
 class LayEggsAction(Action):
     def __init__(self, args):
         super().__init__(args)
-        self.name = 'lay_eggs'
+        self.name = 'LAY_EGGS'
+        self.n = self.args['N']
+        self.location = self.args['LOCATION']
 
-    def execute(self, game_state):
-        player = game_state.current_player
-        choice = game_state.get_player_input(self.name, args=self.args)
-        player.board.lay_eggs(choice)
+    def execute(self, choice, game_state: "GameState") -> bool:
+        game_state.lay_eggs(choice)
 
 
 class DrawCardsAction(Action):

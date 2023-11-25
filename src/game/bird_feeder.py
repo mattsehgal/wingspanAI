@@ -1,6 +1,6 @@
 import random
 
-from typing import Dict
+from typing import Dict, List
 
 
 class FoodDie:

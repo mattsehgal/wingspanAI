@@ -29,7 +29,10 @@ class Location(AutoName):
     # CARD
     BIRD = auto()
     CARD = auto()
+    DECK = auto()
+    HAND = auto()
     THIS = auto()
+    TRAY = auto()
 
     @classmethod
     def _this_x(cls, X: "Location") -> str:

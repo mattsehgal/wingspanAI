@@ -31,7 +31,6 @@ class Habitat:
         self.birds: Dict[int, BirdCard] = {}
 
         self.curr_open_space = self.spaces[0]
-        self.state = self._to_state()
 
     def _init_space_actions(self, idx: int) -> ActionSequence:
         n = self.space_action_n[idx]
@@ -48,7 +47,7 @@ class Habitat:
         spaces = []
 
         for i, n in enumerate(action_n):
-            args = {'n': n}
+            args = {'N': n, 'ITEM': 'ANY', 'LOCATION': 'BIRDFEEDER'}
             actions = [self.base_action(args)]
             # If odd (exchange spaces)
             if i % 2 != 0:

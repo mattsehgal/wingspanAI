@@ -4,6 +4,7 @@ from actions import *
 class BirdPower:
     def __init__(self, bird_id: int, actions: ActionSequence):
         self.bird_id = bird_id
+        self.actions = actions
 
     def execute(self):
         self.actions.execute()
@@ -128,7 +129,7 @@ class BirdPowerFactory:
             action_list.append(ActionFactory.create(action2, args[1]))
 
         action_seq = ActionSequence(action_list)
-        return GainFoodPower(action_seq)
+        return GainFoodPower(self.bird_id, action_seq)
     # TODO add entailment as an Action
 
     def _build_flocking(self, **kwargs) -> FlockingPower:
