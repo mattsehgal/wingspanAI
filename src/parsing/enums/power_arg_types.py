@@ -1,10 +1,11 @@
-from src.parser.enums.base import AutoName
+from src.parsing.enums.base import AutoName
 from enum import auto
 
 from typing import Optional
 
 
 class Entailment(AutoName):
+    IYD = 'IF YOU DO'
     MAY = auto()
 
 

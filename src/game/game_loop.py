@@ -1,5 +1,5 @@
-from game_controller import GameController
-from game_state import GameState
+from src.game.game_controller import GameController
+from src.game.game_state import GameState
 
 from typing import List
 
@@ -28,8 +28,8 @@ class GameLoop:
                 for _ in self.game_controller.game_state.players:
                     self.game_controller.next_turn()
 
+            self.game_controller.calculate_round_goal()
             self.player_turns -= 1
-
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-from bird_power import BirdPower, BirdPowerFactory
+from src.game.bird_power import BirdPower, BirdPowerFactory
 
 from typing import Dict
 

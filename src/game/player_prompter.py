@@ -4,7 +4,9 @@ from typing import Any, Dict, List
 
 
 class Prompt(Enum):
-    PLAYER_NAME = 'Enter player name:'
+    STARTUP = 'Welcome to WingspanAI\'s simulator.\nPress [ENTER] to begin.'
+    PLAYER_NAME = 'Enter player name:\t'
+    PLAYER_NUM = 'Enter number of players:\t'
     GAIN = 'Gain $N $ITEM from $LOCATION'
     LAY = 'Lay $N $ITEM on $LOCATION'
     DRAW = 'Draw $N $ITEM from $LOCATION'
@@ -13,7 +15,9 @@ class Prompt(Enum):
 class Prompter:
     def __init__(self):
         self._prompts = {
+            'STARTUP': Prompt.STARTUP,
             'PLAYER_NAME': Prompt.PLAYER_NAME,
+            'PLAYER_NUM': Prompt.PLAYER_NUM,
             'GAIN_FOOD': Prompt.GAIN,
             'LAY_EGGS': Prompt.LAY,
             'DRAW_CARDS': Prompt.DRAW,
@@ -36,20 +40,24 @@ class Prompter:
         choice = input(prompt)
         return choice
 
-    def get_players(self, n: int) -> List[str]:
+    def get_players(self) -> List[str]:
+        _ = self.prompt({'TYPE': 'STARTUP'})
         players = []
+        n = int(self.prompt({'TYPE': 'PLAYER_NUM'}))
 
         for _ in range(n):
-            prompt = self._prompts['PLAYER_NAME'].value
-            player_name = self._from_user(prompt)
-            players.append(player_name)
+            name = self.prompt({'TYPE': 'PLAYER_NAME'})
+            players.append(name)
 
         return players
 
     def prompt(self, args: Dict[str, str]) -> Any:
         prompt_type = args['TYPE']
         prompt = self._prompts[prompt_type]
-        text = self._fill_args(prompt, args)
+        if any(['$' in v for k, v in args.items()]):
+            text = self._fill_args(prompt, args)
+        else:
+            text = prompt.value
 
         return self._from_user(text)
 

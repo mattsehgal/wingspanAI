@@ -1,10 +1,10 @@
 import random
 
-from bird_feeder import BirdFeeder
-from board import Board
-from deck import BirdDeck, BonusDeck
-from player import Player
-from round_goals import RoundGoalsBoard, RoundGoal
+from src.game.bird_feeder import BirdFeeder
+from src.game.board import Board
+from src.game.deck import BirdDeck, BonusDeck
+from src.game.player import Player
+from src.game.round_goals import RoundGoalsBoard, RoundGoal
 
 from typing import Dict, List, Optional
 
@@ -13,7 +13,7 @@ class GameState:
     def __init__(self, player_names: List[str]):
         # Players
         self.players: Dict[int, Player] = {_id: Player(_id, name) for _id, name in enumerate(player_names)}
-        self.player_boards: Dict[int, Board] = {player.id: player.board for player in self.players}
+        self.player_boards: Dict[int, Board] = {player.id: player.board for _, player in self.players.items()}
         random.shuffle(self.players)  # Set player order
         self.current_player = self.players[0]
         # Game components

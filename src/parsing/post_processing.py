@@ -1,4 +1,4 @@
-from src.parser.enums.power_arg_types import *
+from src.parsing.enums.power_arg_types import *
 
 from typing import List
 

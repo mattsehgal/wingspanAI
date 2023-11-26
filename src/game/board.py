@@ -1,5 +1,5 @@
-from actions import *
-from bird_card import BirdCard
+from src.game.actions import *
+from src.game.bird_card import BirdCard
 
 from typing import List, Optional
 
@@ -66,6 +66,9 @@ class Habitat:
         if self.curr_open_space.bird:
             curr_idx = self.spaces.index(self.curr_open_space)
             self.curr_open_space = self.spaces[curr_idx+1]
+
+    def eggs(self) -> int:
+        return sum([bird.eggs for _id, bird in self.birds.items()])
 
     def execute(self, game_state):
         curr_idx = self.spaces.index(self.curr_open_space)

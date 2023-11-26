@@ -1,6 +1,6 @@
-from actions import Action
-from game_state import GameState
-from player_prompter import Prompter
+from src.game.actions import Action
+from src.game.game_state import GameState
+from src.game.player_prompter import Prompter
 
 from typing import Dict, List
 
@@ -12,8 +12,8 @@ class GameController:
 
         self.history: List[GameState] = [game_state]
 
-    def calculate_round_goals(self):
-        round_goals = self.game_state.round_goals
+    def calculate_round_goal(self):
+        self.game_state.round_goals.calculate(self.game_state)
 
     def execute_action(self, action: Action):
         if action.prompt:

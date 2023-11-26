@@ -1,7 +1,7 @@
-from bird_card import BirdCard
-from bonus_card import BonusCard
-from board import Board
-from deck import BirdDeck
+from src.game.bird_card import BirdCard
+from src.game.bonus_card import BonusCard
+from src.game.board import Board
+from src.game.deck import BirdDeck
 
 from typing import Dict, List, Union
 
@@ -15,11 +15,13 @@ class Player:
         self.bonus_cards: List[BonusCard] = []
 
         self.board = Board(self.id)
-        self.food_tokens = {'slug': 0,
-                            'wheat': 0,
-                            'berry': 0,
-                            'fish': 0,
-                            'rat': 0}
+        self.food_tokens = {
+            'slug':  0,
+            'wheat': 0,
+            'berry': 0,
+            'fish':  0,
+            'rat':   0
+        }
 
         self.score = 0
 

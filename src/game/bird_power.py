@@ -1,4 +1,4 @@
-from actions import *
+from src.game.actions import *
 
 
 class BirdPower:
@@ -121,16 +121,14 @@ class BirdPowerFactory:
         entailment1 = kwargs.get('ENTAILMENT1', None)
 
         args = self._to_action_args(**kwargs)
-        print(action1, args[0])
         action_list = [ActionFactory.create(action1, args[0])]
 
         if entailment1:
             action2 = kwargs.get('ACTION2', None)
-            action_list.append(ActionFactory.create(action2, args[1]))
+            action_list.append(ActionFactory.create(entailment1, args[1], entailed=action2))
 
         action_seq = ActionSequence(action_list)
         return GainFoodPower(self.bird_id, action_seq)
-    # TODO add entailment as an Action
 
     def _build_flocking(self, **kwargs) -> FlockingPower:
         actions = ActionSequence([])
