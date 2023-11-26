@@ -24,10 +24,13 @@ class PlayBirdAction(Action):
 class GainFoodAction(Action):
     def __init__(self, args):
         super().__init__(args)
-        self.name = 'GAIN_FOOD'
-        self.n = self.args['N']
-        self.item = self.args['ITEM']
-        self.location = self.args['LOCATION']
+        try:
+            self.name = 'GAIN_FOOD'
+            self.n = self.args['N']
+            self.item = self.args['ITEM']
+            self.location = self.args['LOCATION']
+        except KeyError:
+            pass
 
     def execute(self, game_state: "GameState", choice: Dict[str, str]) -> bool:
         food_tokens = choice['FOOD_TOKENS']

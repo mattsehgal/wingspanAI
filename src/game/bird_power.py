@@ -179,5 +179,5 @@ class BirdPowerFactory:
             pass
         # DEFAULT
         else:
-            return BirdPower(ActionSequence([]))
+            return BirdPower(self.bird_id, ActionSequence([]))
 
