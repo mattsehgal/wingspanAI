@@ -115,17 +115,17 @@ class BirdPowerFactory:
 
     def _build_gain_food(self, **kwargs) -> GainFoodPower:
         action1 = kwargs.get('ACTION1', None)
-        item1 = kwargs.get('ITEM1', None)
         n1 = kwargs.get('N1', None)
+        item1 = kwargs.get('ITEM1', None)
         location1 = kwargs.get('LOCATION1', None)
-        entailment1 = kwargs.get('ENTAILMENT1', None)
-
         args = self._to_action_args(**kwargs)
         action_list = [ActionFactory.create(action1, args[0])]
 
+        entailment1 = kwargs.get('ENTAILMENT1', None)
         if entailment1:
             action2 = kwargs.get('ACTION2', None)
-            action_list.append(ActionFactory.create(entailment1, args[1], entailed=action2))
+            entailed_action_args = args[1]
+            action_list.append(ActionFactory.create(entailment1, entailed_action_args, entailed=action2))
 
         action_seq = ActionSequence(action_list)
         return GainFoodPower(self.bird_id, action_seq)

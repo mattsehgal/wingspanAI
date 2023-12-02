@@ -29,7 +29,6 @@ class BirdDeck(Deck):
     def _init_deck() -> List[BirdCard]:
         # df = pd.read_csv('/kaggle/input/wingspan-base-game-birds-cleaned/BaseGameBirds.csv')
         df = parse_csv()
-        test = df['power_args'][:25]
         deck = [BirdCard(row) for index, row in df.iterrows()]
         random.shuffle(deck)
         return deck

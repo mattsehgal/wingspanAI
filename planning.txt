@@ -1,0 +1,48 @@
+Project Status (by file):
+ai/:    Not Started.
+
+game/
+    actions:        More than half complete.
+                        - execute() needs to be done for all, some are not yet implemented.
+    bird_card:      Complete.
+    bird_feeder:    Nearly complete.
+                        - Couple methods to implement.
+    bird_power:     Less than half complete.
+                        - Most powers need to be implemented.
+                        - Most of PowerFactory needs to be done.
+    board:          Complete.
+    bonus_card:     Not started.
+    deck:           Complete.
+    game_cntrllr:   Less than or half complete.
+                        - Partially implemented but more functions will need to be determined.
+    game_loop:      Nearly complete.
+                        - Some additional high level game management functions may be needed.
+    game_state:     Nearly complete.
+                        - Some additional methods may be needed.
+    player:         Basically complete.
+    plyr_prompter:  More than half complete.
+                        - Most if not all functionality is there, TBD what's needed.
+    round_goals:    Less than half complete.
+                        - Need to finish rest of RoundGoals.
+
+parsing/
+    enums/
+        action_type:        Not started.
+        base:               Complete.
+        pwr_arg_typs:       More than half complete.
+                                - More power arg types to implement.
+        pwr_cmpnnt_typs:    Complete.
+    parse_csv:      Basically complete.
+    post_prcssng:   More than half complete?
+                        - More parses need to be implemented.
+
+main:   Not started.
+
+
+Order of Remaining Work:
+1) actions, bird_power
+    1.5) parsing/enums/*, post_processing
+2) bird_feeder, bonus_card, round_goals
+3) game_state, player
+4) game_controller
+5) game_loop, player_prompter

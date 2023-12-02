@@ -1,5 +1,4 @@
-from src.game import game_loop, player_prompter
+from src.game.game_loop import GameLoop
 
 
-players = player_prompter.Prompter().get_players()
-game_loop.GameLoop(players).play()
+GameLoop().play()

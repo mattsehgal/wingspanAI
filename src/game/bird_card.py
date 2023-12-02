@@ -46,6 +46,3 @@ class BirdCard:
 
     def execute(self, game_state):
         self.power.execute(game_state)
-
-    def __eq__(self, other):
-        return self.id

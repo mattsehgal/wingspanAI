@@ -1,12 +1,13 @@
 from src.game.game_controller import GameController
 from src.game.game_state import GameState
+from src.game.player_prompter import Prompter
 
 from typing import List
 
 
 class GameLoop:
-    def __init__(self, player_names: List[str]):
-        self.game_controller = self._init_game_controller(player_names)
+    def __init__(self):
+        self.game_controller = self._init_game_controller(self._init_player_names())
         # Game variables
         self.player_turns = 8
         self.player_turn_number = 1
@@ -17,6 +18,11 @@ class GameLoop:
     def _init_game_controller(player_names: List[str]) -> GameController:
         state = GameState(player_names)
         return GameController(state)
+
+    @staticmethod
+    def _init_player_names() -> List[str]:
+        names = Prompter().get_players()
+        return names
 
     def play(self):
         while self.round_number < self.rounds:
