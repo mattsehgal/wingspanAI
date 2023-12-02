@@ -1,9 +1,10 @@
-from actions import *
+from src.game.actions import *
 
 
 class BirdPower:
     def __init__(self, bird_id: int, actions: ActionSequence):
         self.bird_id = bird_id
+        self.actions = actions
 
     def execute(self):
         self.actions.execute()
@@ -114,22 +115,20 @@ class BirdPowerFactory:
 
     def _build_gain_food(self, **kwargs) -> GainFoodPower:
         action1 = kwargs.get('ACTION1', None)
-        item1 = kwargs.get('ITEM1', None)
         n1 = kwargs.get('N1', None)
+        item1 = kwargs.get('ITEM1', None)
         location1 = kwargs.get('LOCATION1', None)
-        entailment1 = kwargs.get('ENTAILMENT1', None)
-
         args = self._to_action_args(**kwargs)
-        print(action1, args[0])
         action_list = [ActionFactory.create(action1, args[0])]
 
+        entailment1 = kwargs.get('ENTAILMENT1', None)
         if entailment1:
             action2 = kwargs.get('ACTION2', None)
-            action_list.append(ActionFactory.create(action2, args[1]))
+            entailed_action_args = args[1]
+            action_list.append(ActionFactory.create(entailment1, entailed_action_args, entailed=action2))
 
         action_seq = ActionSequence(action_list)
-        return GainFoodPower(action_seq)
-    # TODO add entailment as an Action
+        return GainFoodPower(self.bird_id, action_seq)
 
     def _build_flocking(self, **kwargs) -> FlockingPower:
         actions = ActionSequence([])
@@ -180,5 +179,5 @@ class BirdPowerFactory:
             pass
         # DEFAULT
         else:
-            return BirdPower(ActionSequence([]))
+            return BirdPower(self.bird_id, ActionSequence([]))
 

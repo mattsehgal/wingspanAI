@@ -1,10 +1,11 @@
-from src.parser.enums.base import AutoName
+from src.parsing.enums.base import AutoName
 from enum import auto
 
 from typing import Optional
 
 
 class Entailment(AutoName):
+    IYD = 'IF YOU DO'
     MAY = auto()
 
 
@@ -29,7 +30,10 @@ class Location(AutoName):
     # CARD
     BIRD = auto()
     CARD = auto()
+    DECK = auto()
+    HAND = auto()
     THIS = auto()
+    TRAY = auto()
 
     @classmethod
     def _this_x(cls, X: "Location") -> str:

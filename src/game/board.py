@@ -1,5 +1,5 @@
-from actions import *
-from bird_card import BirdCard
+from src.game.actions import *
+from src.game.bird_card import BirdCard
 
 from typing import List, Optional
 
@@ -31,7 +31,6 @@ class Habitat:
         self.birds: Dict[int, BirdCard] = {}
 
         self.curr_open_space = self.spaces[0]
-        self.state = self._to_state()
 
     def _init_space_actions(self, idx: int) -> ActionSequence:
         n = self.space_action_n[idx]
@@ -48,7 +47,7 @@ class Habitat:
         spaces = []
 
         for i, n in enumerate(action_n):
-            args = {'n': n}
+            args = {'N': n, 'ITEM': 'ANY', 'LOCATION': 'BIRDFEEDER'}
             actions = [self.base_action(args)]
             # If odd (exchange spaces)
             if i % 2 != 0:
@@ -67,6 +66,9 @@ class Habitat:
         if self.curr_open_space.bird:
             curr_idx = self.spaces.index(self.curr_open_space)
             self.curr_open_space = self.spaces[curr_idx+1]
+
+    def eggs(self) -> int:
+        return sum([bird.eggs for _id, bird in self.birds.items()])
 
     def execute(self, game_state):
         curr_idx = self.spaces.index(self.curr_open_space)

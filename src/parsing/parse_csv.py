@@ -3,8 +3,8 @@ import os
 import pandas as pd
 import re
 
-from src.parser.enums.power_component_types import *
-from src.parser.post_processing import *
+from src.parsing.enums.power_component_types import *
+from src.parsing.post_processing import *
 
 from typing import AnyStr, Dict, List, Optional
 

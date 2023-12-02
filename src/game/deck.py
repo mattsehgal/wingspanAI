@@ -1,8 +1,8 @@
 import random
 
-from bird_card import BirdCard
-from bonus_card import BonusCard
-from src.parser.parse_csv import parse_csv
+from src.game.bird_card import BirdCard
+from src.game.bonus_card import BonusCard
+from src.parsing.parse_csv import parse_csv
 
 from typing import List, Union
 

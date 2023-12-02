@@ -1,5 +1,4 @@
-from bird_power import BirdPower, BirdPowerFactory
-from state import BirdState
+from src.game.bird_power import BirdPower, BirdPowerFactory
 
 from typing import Dict
 
@@ -43,10 +42,7 @@ class BirdCard:
 
     def _init_power(self, bird_card) -> BirdPower:
         args = bird_card['power_args']
-        return BirdPowerFactory().create(**args)
+        return BirdPowerFactory(bird_card['id']).create(**args)
 
     def execute(self, game_state):
         self.power.execute(game_state)
-
-    def __eq__(self, other):
-        return self.id
